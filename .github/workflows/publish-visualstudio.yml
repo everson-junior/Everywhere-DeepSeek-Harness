@@ -26,6 +26,8 @@ jobs:
   build-and-publish:
     name: Build & Publish Visual Studio VSIX
     runs-on: windows-latest
+    env:
+      VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -283,10 +285,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to Visual Studio Marketplace
-        if: ${{ env.VS_MARKETPLACE_TOKEN != '' && (github.event_name == 'release' || github.event.inputs.publish_marketplace != false) }}
+        if: ${{ env.VS_MARKETPLACE_TOKEN != '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace != false) }}
         shell: pwsh
-        env:
-          VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
         run: |
           $vsixFile = "${{ steps.locate-vsix.outputs.vsix_path }}"
           if (-not (Test-Path $vsixFile)) {
@@ -320,9 +320,7 @@ jobs:
           Write-Host "✅ Publicação no Visual Studio Marketplace concluída com sucesso!"
 
       - name: Marketplace Notice (quando VS_MARKETPLACE_TOKEN não estiver configurado)
-        if: ${{ env.VS_MARKETPLACE_TOKEN == '' }}
+        if: ${{ env.VS_MARKETPLACE_TOKEN == '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace != false) }}
         shell: pwsh
-        env:
-          VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
         run: |
           Write-Host "::notice title=Visual Studio Marketplace Skipped::O artefato .vsix foi gerado e validado com sucesso. Para publicar automaticamente no Visual Studio Marketplace, configure o secret 'VS_MARKETPLACE_TOKEN' em Settings -> Secrets and variables -> Actions no repositório GitHub."

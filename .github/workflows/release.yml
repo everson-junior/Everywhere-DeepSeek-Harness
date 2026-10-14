@@ -57,6 +57,8 @@ jobs:
     name: Build VS Code VSIX
     needs: get-version
     runs-on: ubuntu-latest
+    env:
+      VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -105,10 +107,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to Visual Studio Marketplace
-        if: ${{ env.VS_MARKETPLACE_TOKEN != '' && (github.event_name == 'release' || github.event.inputs.publish_marketplace == true) }}
+        if: ${{ env.VS_MARKETPLACE_TOKEN != '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace == true) }}
         working-directory: vscode
-        env:
-          VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
         run: |
           echo "🚀 Publicando extensão no Visual Studio Marketplace..."
           VSIX_FILE=$(ls *.vsix | head -n 1)
@@ -116,9 +116,7 @@ jobs:
           echo "✅ Publicação concluída com sucesso!"
 
       - name: Marketplace Notice (quando token não estiver configurado)
-        if: ${{ env.VS_MARKETPLACE_TOKEN == '' }}
-        env:
-          VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+        if: ${{ env.VS_MARKETPLACE_TOKEN == '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace == true) }}
         run: |
           echo "::notice title=Marketplace Publish Skipped::O arquivo .vsix foi gerado e anexado aos artefatos da Release. Para habilitar a publicação automática no Visual Studio Marketplace, adicione o secret 'VS_MARKETPLACE_TOKEN' nas configurações do repositório (Settings -> Secrets and variables -> Actions)."
 

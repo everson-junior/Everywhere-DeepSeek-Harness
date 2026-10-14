@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Everywhere - DeepSeek Harness
+Bundle-Name: Everywhere DeepSeek Harness
 Bundle-SymbolicName: com.deepseek.everywhere;singleton:=true
 Bundle-Version: 1.2.1
 Bundle-Activator: com.deepseek.everywhere.Activator

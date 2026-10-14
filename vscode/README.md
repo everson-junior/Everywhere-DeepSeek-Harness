@@ -2,7 +2,7 @@
 
 <img src="./media/everdock-banner.jpg" alt="Everywhere - Conectando suas IDEs ao DeepSeek" width="100%" />
 
-# Everywhere: DeepSeek Harness for Visual Studio Code
+# Everywhere DeepSeek Harness for Visual Studio Code
 
 English | [Português](../README.md) | [中文](README.zh.md)
 

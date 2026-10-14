@@ -21,7 +21,7 @@ class EverywhereConfigurable : Configurable {
     private val baseUrlField = JBTextField()
     private val customDshPathField = TextFieldWithBrowseButton()
 
-    override fun getDisplayName(): String = "Everywhere: DeepSeek Harness"
+    override fun getDisplayName(): String = "Everywhere DeepSeek Harness"
 
     override fun createComponent(): JComponent {
         customDshPathField.addBrowseFolderListener(

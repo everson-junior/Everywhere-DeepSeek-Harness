@@ -1,6 +1,6 @@
 <div align="center">
 
-# Everywhere: DeepSeek Harness for Eclipse IDE 🌐⚡
+# Everywhere DeepSeek Harness for Eclipse IDE 🌐⚡
 
 **Conectando o Eclipse IDE ao DeepSeek Harness**
 
@@ -23,7 +23,7 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nati
 - 🪟 **View Nativa com Navegador Embutido**: Exibe a interface do DeepSeek Harness diretamente em uma aba/view do Eclipse (`Window -> Show View -> Other... -> Everywhere`).
 - 📂 **Workspace & Project Binding**: O assistente é iniciado com o diretório do projeto ou workspace atualmente ativo (`IWorkspace` / `IProject`), permitindo inspeção, criação e edição de código contextual.
 - 🔄 **Auto-Recuperação Inteligente (Exit Code 1)**: Detecção automática de conflito de portas (3080/3000) ou encerramento inesperado, finalizando processos órfãos (`fuser`, `pkill`, `taskkill`) e reiniciando a conexão de forma transparente.
-- 📄 **Console de Logs Integrado**: Canal de log em tempo real na aba padrão do Eclipse (`Console` ➔ `Everywhere - DeepSeek Harness`) com formatação e diferenciação por cores de saída e erro.
+- 📄 **Console de Logs Integrado**: Canal de log em tempo real na aba padrão do Eclipse (`Console` ➔ `Everywhere DeepSeek Harness`) com formatação e diferenciação por cores de saída e erro.
 - 🧭 **Barra de Ferramentas Dedicada (View Toolbar)**:
   - ▶ **Iniciar**: Inicia o runtime `dsh`.
   - 🛑 **Parar**: Interrompe o processo e libera portas de rede.
@@ -31,7 +31,7 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nati
   - 🔁 **Recarregar**: Atualiza a página do navegador embutido.
   - 🌐 **Abrir no Navegador**: Abre a interface web no browser padrão do sistema operacional.
   - ⚙️ **Configurações**: Acesso direto às preferências do plugin.
-- ⚙️ **Página de Preferências do Eclipse**: Integrada ao menu padrão `Window` ➔ `Preferences` ➔ `Everywhere (DeepSeek)`.
+- ⚙️ **Página de Preferências do Eclipse**: Integrada ao menu padrão `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
 - ⌨️ **Menu e Atalhos no Workbench**: Menu `Everywhere` na barra principal com comandos para iniciar, parar e abrir a visão.
 
 ---

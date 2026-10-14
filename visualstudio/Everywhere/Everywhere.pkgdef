@@ -1,5 +1,5 @@
 [$RootKey$\InstalledProducts\EverywherePackage]
-@="Everywhere - DeepSeek Harness for Visual Studio"
+@="Everywhere DeepSeek Harness"
 "PID"="0.1.0"
 "ProductDetails"="Run official DeepSeek Harness autonomous AI agents directly inside Visual Studio 2022."
 

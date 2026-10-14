@@ -2,7 +2,7 @@
 
 <img src="./Everywhere/Resources/Preview.png" alt="Everywhere - Visual Studio 2022 Extension" width="100%" />
 
-# Everywhere: DeepSeek Harness for Visual Studio 2022
+# Everywhere DeepSeek Harness for Visual Studio 2022
 
 **Conectando o Visual Studio 2022 ao DeepSeek Harness**
 

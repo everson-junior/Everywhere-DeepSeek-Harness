@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
     <Identity Id="Everywhere.DeepSeek.VSIX" Version="0.1.0" Language="en-US" Publisher="Everywhere" />
-    <DisplayName>Everywhere - DeepSeek Harness for Visual Studio</DisplayName>
+    <DisplayName>Everywhere DeepSeek Harness</DisplayName>
     <Description xml:space="preserve">Connect Visual Studio 2022 to the official DeepSeek Harness autonomous AI agent runtime. Full tool calling, autonomous workspace inspection and live reasoning in your IDE.</Description>
     <MoreInfo>https://github.com/everson-junior/DeepSeek-Harness-Everywhere</MoreInfo>
     <Icon>Resources/Icon.png</Icon>

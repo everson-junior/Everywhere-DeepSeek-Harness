@@ -1,4 +1,4 @@
-# DeepSeek Chat & Harness for Visual Studio Code
+# Everywhere DeepSeek Harness for Visual Studio Code
 
 [English](README.md) | 中文
 

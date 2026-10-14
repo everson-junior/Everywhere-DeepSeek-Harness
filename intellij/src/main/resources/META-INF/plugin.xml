@@ -1,11 +1,11 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.deepseek.everywhere</id>
-    <name>Everywhere: DeepSeek Harness</name>
+    <name>Everywhere DeepSeek Harness</name>
     <vendor email="support@deepseek.com" url="https://github.com/everson-junior/DeepSeek-Harness-Everywhere">Everywhere Team</vendor>
 
     <description><![CDATA[
-        <h2>Everywhere: DeepSeek Harness for IntelliJ IDEA</h2>
+        <h2>Everywhere DeepSeek Harness for IntelliJ IDEA</h2>
         <p>Integrates the official <b>DeepSeek Harness (dsh)</b> autonomous AI agent runtime directly inside IntelliJ IDEA.</p>
 
         <h3>Features:</h3>
@@ -33,7 +33,7 @@
         <applicationConfigurable parentId="tools"
                                  instance="com.deepseek.everywhere.settings.EverywhereConfigurable"
                                  id="com.deepseek.everywhere.settings.EverywhereConfigurable"
-                                 displayName="Everywhere: DeepSeek Harness"/>
+                                 displayName="Everywhere DeepSeek Harness"/>
 
         <notificationGroup id="Everywhere Notification Group" displayType="BALLOON"/>
     </extensions>

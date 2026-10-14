@@ -1,6 +1,6 @@
 <div align="center">
 
-# Everywhere: DeepSeek Harness for IntelliJ IDEA 🌐⚡
+# Everywhere DeepSeek Harness for IntelliJ IDEA 🌐⚡
 
 **Conectando o IntelliJ IDEA ao DeepSeek Harness**
 
@@ -22,7 +22,7 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma janela de
 - 🪟 **Tool Window Nativa com JCEF**: Renderização fluida e moderna com Chromium embutido na barra lateral direita do IntelliJ.
 - 📂 **Workspace Project Binding**: Conectado contextualmente à pasta raiz do projeto aberto no IntelliJ IDEA (`project.basePath`).
 - 🔄 **Auto-Recuperação Inteligente (Exit Code 1)**: Se houver processos antigos ou portas travadas (3080/3000), o plugin detecta a falha, encerra automaticamente os processos órfãos (`taskkill` / `fuser` / `pkill`) e retoma o serviço em segundos.
-- ⚙️ **Página de Configurações Integrada**: Configurações em `Settings -> Tools -> Everywhere: DeepSeek Harness` (chaves de API, portas, perfis, auto-start e caminho do executável).
+- ⚙️ **Página de Configurações Integrada**: Configurações em `Settings -> Tools -> Everywhere DeepSeek Harness` (chaves de API, portas, perfis, auto-start e caminho do executável).
 - 🧭 **Barra de Ações Rápida (Toolbar)**:
   - ▶ **Iniciar**: Inicia o runtime oficial `dsh`.
   - 🛑 **Parar**: Interrompe o processo e desocupa portas.

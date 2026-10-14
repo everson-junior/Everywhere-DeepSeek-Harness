@@ -16,7 +16,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
  */
 public class EverywhereConsole {
 
-    private static final String CONSOLE_NAME = "Everywhere - DeepSeek Harness";
+    private static final String CONSOLE_NAME = "Everywhere DeepSeek Harness";
     private static MessageConsole console;
     private static MessageConsoleStream infoStream;
     private static MessageConsoleStream errStream;

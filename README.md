@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./assets/everdock-banner.jpg" alt="Everywhere - Conectando suas IDEs ao DeepSeek" width="100%" />
+<img src="./assets/everdock-banner.jpg" alt="Everywhere DeepSeek Harness - Conectando suas IDEs ao DeepSeek" width="100%" />
 
-# Everywhere 🌐⚡
+# Everywhere DeepSeek Harness 🌐⚡
 
 **Everywhere DeepSeek Harness — Conectando suas IDEs ao DeepSeek**
 
@@ -87,7 +87,7 @@ A extensão oficial para **IntelliJ IDEA 2024.1+** (Community e Ultimate) está 
 - **Project Binding Automático**: Roda contextualmente vinculado ao diretório do projeto aberto no IntelliJ (`project.basePath`).
 - **Auto-Recuperação (Exit Code 1)**: Mata processos órfãos e portas presas (3080/3000) e reconecta automaticamente.
 - **Toolbar de Controle Completo**: Iniciar (▶), Parar (🛑), Reiniciar (🔄), Recarregar (🔁), Abrir no Navegador (🌐) e Atalho para Configurações (⚙️).
-- **Configurações em Settings**: Integrado a `File` ➔ `Settings` ➔ `Tools` ➔ `Everywhere: DeepSeek Harness`.
+- **Configurações em Settings**: Integrado a `File` ➔ `Settings` ➔ `Tools` ➔ `Everywhere DeepSeek Harness`.
 
 ---
 
@@ -99,9 +99,9 @@ A extensão oficial para **Eclipse IDE** (validada para **Eclipse IDE for Java D
 - **View Nativa com SWT Browser**: Renderização do DeepSeek Harness integrada em view nativa do Eclipse via WebKitGTK / Edge / WebKit.
 - **Workspace & Project Binding Automático**: Roda contextualmente vinculado ao projeto selecionado ou à raiz do Workspace (`IWorkspace` / `IProject`).
 - **Auto-Recuperação (Exit Code 1)**: Mata processos órfãos e portas presas (3080/3000) e reconecta automaticamente.
-- **Console Integrado**: Canal de saída em tempo real no console padrão do Eclipse (`Everywhere - DeepSeek Harness`).
+- **Console Integrado**: Canal de saída em tempo real no console padrão do Eclipse (`Everywhere DeepSeek Harness`).
 - **Toolbar de Controle Completo**: Iniciar (▶), Parar (🛑), Reiniciar (🔄), Recarregar (🔁), Abrir no Navegador (🌐) e Atalho para Configurações (⚙️).
-- **Preferências no Eclipse**: Integrado a `Window` ➔ `Preferences` ➔ `Everywhere (DeepSeek)`.
+- **Preferências no Eclipse**: Integrado a `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
 - **Menu e Comandos**: Acesso rápido pelo menu superior `Everywhere` e ícone na barra de ferramentas.
 
 ---

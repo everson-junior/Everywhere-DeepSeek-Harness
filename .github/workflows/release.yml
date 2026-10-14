@@ -272,7 +272,7 @@ jobs:
                 localizedResources = @(
                   [ordered]@{
                     language = "en-US"
-                    title = "Everywhere - DeepSeek Harness for Visual Studio"
+                    title = "Everywhere DeepSeek Harness"
                     description = "Connect Visual Studio 2022 to the official DeepSeek Harness autonomous AI agent runtime."
                   }
                 )

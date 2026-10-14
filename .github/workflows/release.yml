@@ -236,10 +236,10 @@ jobs:
 
           # manifest.json matching working reference schema (saved WITHOUT BOM)
           $manifestObj = [ordered]@{
-            id = "Everywhere.DeepSeek.VSIX"
+            id = "Everywhere-DeepSeek-VSIX"
             version = $ver
             type = "Vsix"
-            vsixId = "Everywhere.DeepSeek.VSIX"
+            vsixId = "Everywhere-DeepSeek-VSIX"
             extensionDir = "[installdir]\Common7\IDE\Extensions\Everywhere"
             files = $fileList
             installSizes = [ordered]@{
@@ -256,17 +256,17 @@ jobs:
           $catalogObj = [ordered]@{
             manifestVersion = "1.1"
             info = [ordered]@{
-              id = "Everywhere.DeepSeek.VSIX,version=$ver"
+              id = "Everywhere-DeepSeek-VSIX,version=$ver"
               manifestType = "Extension"
             }
             packages = @(
               [ordered]@{
-                id = "Component.Everywhere.DeepSeek.VSIX"
+                id = "Component.Everywhere-DeepSeek-VSIX"
                 version = $ver
                 type = "Component"
                 extension = $true
                 dependencies = [ordered]@{
-                  "Everywhere.DeepSeek.VSIX" = $ver
+                  "Everywhere-DeepSeek-VSIX" = $ver
                   "Microsoft.VisualStudio.Component.CoreEditor" = "17.0"
                 }
                 localizedResources = @(
@@ -278,7 +278,7 @@ jobs:
                 )
               },
               [ordered]@{
-                id = "Everywhere.DeepSeek.VSIX"
+                id = "Everywhere-DeepSeek-VSIX"
                 version = $ver
                 type = "Vsix"
                 payloads = @(
@@ -287,7 +287,7 @@ jobs:
                     size = [int64]$totalSize
                   }
                 )
-                vsixId = "Everywhere.DeepSeek.VSIX"
+                vsixId = "Everywhere-DeepSeek-VSIX"
                 extensionDir = "[installdir]\Common7\IDE\Extensions\Everywhere"
                 installSizes = [ordered]@{
                   targetDrive = [int64]$totalSize

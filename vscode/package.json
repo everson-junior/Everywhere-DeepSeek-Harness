@@ -2,9 +2,9 @@
   "name": "everywhere",
   "displayName": "Everywhere DeepSeek Harness",
   "description": "Use everywhere DeepSeek Harness: autonomous AI agent directly inside Visual Studio Code sidebar and editor",
-  "version": "0.1.0",
+  "version": "1.2.4",
   "icon": "assets/icon/icon.png",
-  "publisher": "deepseek-ai",
+  "publisher": "everson-junior",
   "license": "MIT",
   "repository": {
     "type": "git",

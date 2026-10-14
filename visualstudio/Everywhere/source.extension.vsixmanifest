@@ -7,7 +7,7 @@
     <MoreInfo>https://github.com/everson-junior/DeepSeek-Harness-Everywhere</MoreInfo>
     <Icon>Resources/Icon.png</Icon>
     <PreviewImage>Resources/Preview.png</PreviewImage>
-    <Tags>deepseek, harness, ai, agent, reasoner, v3, r1, autonomous, coding</Tags>
+    <Tags>deepseek, ai, agent, reasoner, coding</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, )">

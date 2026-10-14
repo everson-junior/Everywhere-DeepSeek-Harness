@@ -2,7 +2,7 @@
   "$schema": "http://json.schemastore.org/vsix-publish",
   "categories": [
     "coding",
-    "ai"
+    "tools"
   ],
   "identity": {
     "internalName": "Everywhere.DeepSeek.VSIX"

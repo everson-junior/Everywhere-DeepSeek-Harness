@@ -127,6 +127,8 @@ jobs:
     name: Build Visual Studio 2022 VSIX
     needs: get-version
     runs-on: windows-latest
+    env:
+      VS_MARKETPLACE_TOKEN: ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -362,6 +364,44 @@ jobs:
           files: visualstudio/**/*.vsix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Visual Studio Marketplace
+        if: ${{ env.VS_MARKETPLACE_TOKEN != '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace != false) }}
+        shell: pwsh
+        run: |
+          $vsixFile = (Get-ChildItem -Path visualstudio -Filter *.vsix -Recurse | Select-Object -First 1).FullName
+          Write-Host "🚀 Iniciando publicação da extensão Visual Studio 2022 no Marketplace com VsixPublisher..."
+          Write-Host "Payload: $vsixFile"
+
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -products * -property installationPath
+          $vsixPublisher = Join-Path $vsPath "VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe"
+          if (-not (Test-Path $vsixPublisher)) {
+            $found = Get-ChildItem -Path "$vsPath\VSSDK" -Filter "VsixPublisher.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) {
+              $vsixPublisher = $found.FullName
+            } else {
+              throw "VsixPublisher.exe não foi encontrado na instalação do Visual Studio em $vsPath!"
+            }
+          }
+          Write-Host "Localizado VsixPublisher: $vsixPublisher"
+
+          & $vsixPublisher publish `
+            -payload "$vsixFile" `
+            -publishManifest "visualstudio/publishManifest.json" `
+            -personalAccessToken "$env:VS_MARKETPLACE_TOKEN" `
+            -ignoreWarnings "VSIXValidatorWarning01,VSIXValidatorWarning02"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Publicação falhou com código de saída $LASTEXITCODE"
+          }
+          Write-Host "✅ Publicação no Visual Studio Marketplace concluída com sucesso!"
+
+      - name: Marketplace Notice (quando VS_MARKETPLACE_TOKEN não estiver configurado)
+        if: ${{ env.VS_MARKETPLACE_TOKEN == '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace != false) }}
+        shell: pwsh
+        run: |
+          Write-Host "::notice title=Visual Studio Marketplace Skipped::O artefato .vsix do Visual Studio 2022 foi gerado e validado. Para publicar automaticamente no Marketplace, configure o secret 'VS_MARKETPLACE_TOKEN' no repositório GitHub."
 
   # -------------------------------------------------------------
   # 3. IntelliJ IDEA Plugin (.zip)

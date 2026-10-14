@@ -2,7 +2,7 @@
 
 # Everywhere DeepSeek Harness for Eclipse IDE 🌐⚡
 
-**Conectando o Eclipse IDE ao DeepSeek Harness**
+[English](#-english) • [Português](#-português)
 
 [![Eclipse IDE](https://img.shields.io/badge/Eclipse%20IDE-2026--09%20(4.41.0)-2c2255?logo=eclipseide)](https://eclipse.org/)
 [![Java Runtime](https://img.shields.io/badge/Java-17%2B%20%7C%2025-orange?logo=openjdk)](https://openjdk.org/)
@@ -12,13 +12,126 @@
 
 </div>
 
+---
+
+## 🇺🇸 English
+
+**Everywhere DeepSeek Harness** is the official extension developed for the **Eclipse IDE**, with validated native support for **Eclipse IDE for Java Developers (2026-09 / 4.41.0)** and compatible releases.
+
+It embeds the official **DeepSeek Harness (`dsh`)** runtime inside a native Eclipse View using the **SWT Browser** widget, directly connecting **DeepSeek-V3** and **DeepSeek-R1 (Reasoner)** autonomous models to your development workspace.
+
+### 🌟 Features
+
+- 🪟 **Native View with Embedded Browser**: Displays the DeepSeek Harness interface inside a dedicated Eclipse View (`Window -> Show View -> Other... -> Everywhere`).
+- 📂 **Workspace & Project Binding**: Automatically booted with the active Eclipse workspace or project directory (`IWorkspace` / `IProject`), enabling contextual code inspection and editing.
+- 🔄 **Intelligent Auto-Recovery (Exit Code 1)**: Automated port conflict detection (3080/3000) or unexpected terminations, terminating orphaned processes (`fuser`, `pkill`, `taskkill`) and reconnecting transparently.
+- 📄 **Integrated Output Console**: Real-time log stream in the standard Eclipse Console view (`Console` ➔ `Everywhere DeepSeek Harness`) with color-coded standard output and errors.
+- 🧭 **Dedicated View Toolbar**:
+  - ▶ **Start**: Boots the `dsh` runtime.
+  - 🛑 **Stop**: Halts the process and releases network ports.
+  - 🔄 **Restart**: Restarts the assistant session.
+  - 🔁 **Reload**: Refreshes the embedded browser view.
+  - 🌐 **Open in Browser**: Opens the web interface in your default system browser.
+  - ⚙️ **Settings**: Direct shortcut to plugin preferences.
+- ⚙️ **Eclipse Preferences Page**: Fully integrated under `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
+- ⌨️ **Workbench Menu & Commands**: Dedicated `Everywhere` menu on the main menu bar to start, stop, and toggle the view.
+
+### 🚀 Build & Package
+
+#### Prerequisites
+1. **Eclipse IDE 2026-09 (4.41.0)** or any compatible Eclipse distribution.
+2. **Java 17+** or **Java 25** (Eclipse bundled compiler is automatically detected).
+3. **DeepSeek Harness CLI**:
+   ```bash
+   npm install -g @deepseek-ai/dsh
+   ```
+
+#### Quick Build & Local Installation
+
+Inside the `eclipse` directory:
+
+```bash
+# Add execution permissions (if needed)
+chmod +x build.sh
+
+# Build and install directly into your local Eclipse
+./build.sh --install
+```
+
+The script will:
+1. Detect the Java compiler (bundled in Eclipse or system JDK).
+2. Locate Eclipse target libraries (`org.eclipse.ui`, `swt`, `core.runtime`, etc.).
+3. Compile all source files under `eclipse/src/`.
+4. Package the OSGi bundle at `eclipse/build/com.deepseek.everywhere_1.0.0.jar`.
+5. Install into `dropins` and `plugins` folders, updating `bundles.info`.
+
+#### Manual Installation
+
+If you prefer copying the `.jar` bundle manually:
+1. Run `./build.sh` to produce the package.
+2. Copy the generated file:
+   ```bash
+   cp eclipse/build/com.deepseek.everywhere_1.0.0.jar <eclipse_path>/dropins/
+   ```
+3. Start or restart Eclipse with `-clean`:
+   ```bash
+   eclipse -clean
+   ```
+
+### 🎯 How to Use in Eclipse
+
+1. Open **Eclipse IDE**.
+2. Open the Everywhere view:
+   - Menu `Window` ➔ `Show View` ➔ `Other...`
+   - Expand the **Everywhere** category and select **Everywhere (DeepSeek Harness)**.
+   - Or click the DeepSeek icon on the top workbench toolbar.
+3. If **Auto Start** is enabled, DeepSeek Harness will boot automatically.
+4. To monitor diagnostics, switch to the **Console** view and select `Everywhere - DeepSeek Harness`.
+
+### ⚙️ Preferences (Window ➔ Preferences ➔ Everywhere)
+
+| Option | Default | Description |
+|---|---|---|
+| **Auto Start** | `true` | Automatically starts the agent when opening the View |
+| **HTTP Server Port** | `0` | Local port (0 assigns an available port automatically) |
+| **Harness Profile** | `"web"` | Execution profile (`web`, `headless`, `tui`) |
+| **DeepSeek API Key** | `""` | DeepSeek API key (also inherited from `DEEPSEEK_API_KEY`) |
+| **API Base URL** | `https://api.deepseek.com` | DeepSeek API endpoint base URL |
+| **Custom 'dsh' Path** | `""` | Custom binary path if `dsh` is not in standard PATH |
+
+### 🏛️ Architecture & Project Structure
+
+```
+eclipse/
+├── .classpath                   # Eclipse PDE classpath configuration
+├── .project                     # Eclipse project descriptor
+├── build.properties             # PDE build configuration
+├── build.sh                     # Compilation and auto-installation script
+├── pom.xml                      # Maven Tycho configuration
+├── plugin.xml                   # Views, Menus, Commands, and Preferences registry
+├── META-INF/
+│   └── MANIFEST.MF              # OSGi Bundle manifest and dependencies
+├── icons/                       # Action and view icons (PNG and SVG)
+└── src/com/deepseek/everywhere/
+    ├── Activator.java           # Bundle lifecycle and cleanup on Eclipse shutdown
+    ├── actions/                 # Toolbar actions (Start, Stop, Restart, etc.)
+    ├── console/                 # Integration with Eclipse MessageConsole
+    ├── handlers/                # Workbench command handlers
+    ├── model/                   # State enums and listener interfaces
+    ├── preferences/             # Preference pages and default initializers
+    ├── service/                 # Process lifecycle and resilience manager (DshManager)
+    └── ui/                      # SWT Browser view integration (EverywhereView)
+```
+
+---
+
+## 🇧🇷 Português
+
 Esta é a extensão oficial do **Everywhere** desenvolvida para o **Eclipse IDE**, com suporte nativo e validado para **Eclipse IDE for Java Developers (2026-09 / 4.41.0, Build id: 20260903-0720)** e versões compatíveis.
 
 Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nativa do Eclipse utilizando o widget **SWT Browser**, conectando os modelos autônomos **DeepSeek-V3** e **DeepSeek-R1** diretamente ao seu workspace de desenvolvimento.
 
----
-
-## 🌟 Funcionalidades
+### 🌟 Funcionalidades
 
 - 🪟 **View Nativa com Navegador Embutido**: Exibe a interface do DeepSeek Harness diretamente em uma aba/view do Eclipse (`Window -> Show View -> Other... -> Everywhere`).
 - 📂 **Workspace & Project Binding**: O assistente é iniciado com o diretório do projeto ou workspace atualmente ativo (`IWorkspace` / `IProject`), permitindo inspeção, criação e edição de código contextual.
@@ -34,11 +147,9 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nati
 - ⚙️ **Página de Preferências do Eclipse**: Integrada ao menu padrão `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
 - ⌨️ **Menu e Atalhos no Workbench**: Menu `Everywhere` na barra principal com comandos para iniciar, parar e abrir a visão.
 
----
+### 🚀 Como Compilar e Empacotar o Plugin
 
-## 🚀 Como Compilar e Empacotar o Plugin
-
-### Pré-requisitos
+#### Pré-requisitos
 1. **Eclipse IDE 2026-09 (4.41.0)** ou qualquer instalação Eclipse compatível.
 2. **Java 17+** ou **Java 25** (o compilador bundled do Eclipse é detectado automaticamente).
 3. **DeepSeek Harness CLI**:
@@ -46,9 +157,7 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nati
    npm install -g @deepseek-ai/dsh
    ```
 
----
-
-### Compilação e Instalação Rápida
+#### Compilação e Instalação Rápida
 
 Dentro do diretório `eclipse`:
 
@@ -67,9 +176,7 @@ O script irá:
 4. Gerar o pacote OSGi `eclipse/build/com.deepseek.everywhere_1.0.0.jar`.
 5. Instalar nas pastas `dropins` e `plugins` da sua instalação Eclipse, registrando no `bundles.info`.
 
----
-
-### Instalação Manual
+#### Instalação Manual
 
 Se preferir copiar manualmente o arquivo `.jar`:
 
@@ -84,9 +191,7 @@ Se preferir copiar manualmente o arquivo `.jar`:
    eclipse -clean
    ```
 
----
-
-## 🎯 Como Usar no Eclipse
+### 🎯 Como Usar no Eclipse
 
 1. Abra o **Eclipse IDE 2026-09**.
 2. Abra a visão Everywhere:
@@ -97,9 +202,7 @@ Se preferir copiar manualmente o arquivo `.jar`:
 4. Caso esteja parado, clique no botão **▶ Iniciar DeepSeek Harness** na tela inicial ou na barra de ações.
 5. Para acompanhar diagnósticos, abra a visualização **Console** e selecione o console `Everywhere - DeepSeek Harness`.
 
----
-
-## ⚙️ Configurações (Window ➔ Preferences ➔ Everywhere)
+### ⚙️ Configurações (Window ➔ Preferences ➔ Everywhere)
 
 | Opção | Padrão | Descrição |
 |---|---|---|
@@ -110,9 +213,7 @@ Se preferir copiar manualmente o arquivo `.jar`:
 | **URL Base da API** | `https://api.deepseek.com` | Endpoint da API DeepSeek |
 | **Caminho customizado 'dsh'** | `""` | Caminho personalizado para o binário `dsh` caso não esteja no PATH |
 
----
-
-## 🏛️ Estrutura do Código
+### 🏛️ Estrutura do Código
 
 ```
 eclipse/

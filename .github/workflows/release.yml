@@ -445,10 +445,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # -------------------------------------------------------------
-  # 4. Eclipse IDE Plugin (.jar)
+  # 4. Eclipse IDE Plugin & p2 Update Site (GitHub Pages)
   # -------------------------------------------------------------
   build-eclipse:
-    name: Build Eclipse Plugin
+    name: Build & Deploy Eclipse p2 Update Site
     needs: get-version
     runs-on: ubuntu-latest
 
@@ -461,28 +461,45 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'maven'
 
-      - name: Install Eclipse via Snap
-        run: sudo snap install --classic eclipse
-
-      - name: Build Eclipse Plugin
+      - name: Build Eclipse Multi-Module with Maven Tycho
         working-directory: eclipse
         run: |
-          chmod +x build.sh
-          ./build.sh ${{ needs.get-version.outputs.version }}
+          chmod +x mvnw
+          ./mvnw clean verify
 
-      - name: Upload Eclipse Plugin as Workflow Artifact
+      - name: Prepare p2 Repository for GitHub Pages
+        working-directory: eclipse
+        run: |
+          # Copia landing page index.html e .nojekyll para a raiz do repositório p2
+          cp -f repository/index.html repository/target/repository/index.html
+          touch repository/target/repository/.nojekyll
+
+      - name: Upload Eclipse p2 Repository as Workflow Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: everywhere-eclipse-${{ needs.get-version.outputs.version }}-plugin
-          path: eclipse/build/*.jar
+          name: everywhere-eclipse-${{ needs.get-version.outputs.version }}-p2-repository
+          path: eclipse/repository/target/com.deepseek.everywhere.repository-*.zip
           retention-days: 30
 
-      - name: Attach Eclipse Plugin to GitHub Release Assets
+      - name: Attach Eclipse Update Site ZIP to GitHub Release Assets
         if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: eclipse/build/*.jar
+          files: |
+            eclipse/repository/target/com.deepseek.everywhere.repository-*.zip
+            eclipse/plugin/target/com.deepseek.everywhere-*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy p2 Update Site to GitHub Pages
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./eclipse/repository/target/repository
+          keep_files: false
+          commit_message: "Deploy p2 Update Site v${{ needs.get-version.outputs.version }} [skip ci]"
+
 

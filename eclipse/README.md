@@ -11,6 +11,14 @@
 [![Maven Tycho](https://img.shields.io/badge/Build-Eclipse%20Tycho%204.0.8-blue?logo=apachemaven)](https://github.com/eclipse-tycho/tycho)
 [![Status](https://img.shields.io/badge/Status-Ready-success)]()
 
+<br/>
+
+<div align="center">
+  <a href="https://marketplace.eclipse.org/content/everywhere-deepseek-harness">
+    <img src="https://marketplace.eclipse.org/sites/all/modules/custom/marketplace/images/installbutton.png" alt="Drag and drop into a running Eclipse IDE to install"/>
+  </a>
+</div>
+
 </div>
 
 ---

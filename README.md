@@ -47,7 +47,15 @@ With Everywhere, **DeepSeek-V3** and **DeepSeek-R1 (Reasoner)** models gain supe
 | **VS Code** | TypeScript, Webview | Visual Studio Marketplace (`.vsix`) | [VS Code README](./vscode/README.md) |
 | **Visual Studio 2022** | C#, WPF, Microsoft Edge WebView2 | Visual Studio Marketplace (`.vsix`) | [Visual Studio README](./visualstudio/README.md) |
 | **IntelliJ IDEA** | Kotlin, Gradle, JCEF Chromium | JetBrains Plugin (`.zip`) | [IntelliJ README](./intellij/README.md) |
-| **Eclipse IDE** | Java 17+, OSGi PDE, SWT Browser | Eclipse Plugin (`.jar`) | [Eclipse README](./eclipse/README.md) |
+| **Eclipse IDE** | Java 17+, OSGi Tycho, SWT Browser | [Eclipse Marketplace](https://marketplace.eclipse.org/content/everywhere-deepseek-harness) (p2 Site) | [Eclipse README](./eclipse/README.md) |
+
+<br/>
+
+<div align="center">
+  <a href="https://marketplace.eclipse.org/content/everywhere-deepseek-harness">
+    <img src="https://marketplace.eclipse.org/sites/all/modules/custom/marketplace/images/installbutton.png" alt="Drag and drop into a running Eclipse IDE to install Everywhere DeepSeek Harness in Eclipse"/>
+  </a>
+</div>
 
 ---
 

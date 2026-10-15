@@ -6,11 +6,14 @@ cd "$SCRIPT_DIR"
 
 VERSION="1.0.0"
 INSTALL=false
+USE_TYCHO=false
 
 # Processar argumentos
 for arg in "$@"; do
     if [[ "$arg" == "--install" ]] || [[ "$arg" == "-i" ]]; then
         INSTALL=true
+    elif [[ "$arg" == "--tycho" ]] || [[ "$arg" == "-t" ]] || [[ "$arg" == "--p2" ]]; then
+        USE_TYCHO=true
     elif [[ "$arg" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
         VERSION="$arg"
     fi
@@ -21,18 +24,46 @@ echo " Building Everywhere DeepSeek Harness for Eclipse IDE     "
 echo " Target Version: $VERSION                                "
 echo "=========================================================="
 
+# Garantir sincronização dos ícones para o submódulo plugin
+mkdir -p "$SCRIPT_DIR/plugin/icons"
+if [ -d "$SCRIPT_DIR/icons" ]; then
+    cp -rn "$SCRIPT_DIR/icons/"* "$SCRIPT_DIR/plugin/icons/" 2>/dev/null || true
+fi
+
+# 1. Compilação via Maven Tycho (Gera Update Site p2 completo)
+if [ "$USE_TYCHO" = true ] || command -v mvn >/dev/null 2>&1; then
+    echo "-> Compilando projeto multi-módulo com Maven Tycho..."
+    mvn clean verify -Dtycho.mode=maven
+
+    REPO_DIR="$SCRIPT_DIR/repository/target/repository"
+    if [ -d "$REPO_DIR" ]; then
+        echo ""
+        echo "=========================================================="
+        echo " [SUCESSO] Update Site p2 gerado com sucesso!"
+        echo " Diretório do Update Site: $REPO_DIR"
+        echo " Arquivos gerados:"
+        echo "   - artifacts.jar"
+        echo "   - content.jar"
+        echo "   - plugins/"
+        echo "   - features/"
+        echo " Arquivo compactado para release:"
+        echo "   - $SCRIPT_DIR/repository/target/com.deepseek.everywhere.repository-*.zip"
+        echo "=========================================================="
+        exit 0
+    fi
+fi
+
+# 2. Compilação Fallback (Script Standalone PDE)
 BUILD_DIR="$SCRIPT_DIR/build"
-BIN_DIR="$SCRIPT_DIR/bin"
+BIN_DIR="$SCRIPT_DIR/plugin/bin"
 JAR_NAME="com.deepseek.everywhere_${VERSION}.jar"
 TARGET_JAR="$BUILD_DIR/$JAR_NAME"
 
 mkdir -p "$BIN_DIR" "$BUILD_DIR"
 
-# 1. Localizar compilador Java (JRE bundled no Eclipse ou JDK no PATH)
 JAVAC=""
 JAR_BIN=""
 
-# Tenta encontrar primeiro o compilador do próprio Eclipse (JustJ Java 25)
 JUSTJ_JAVAC=$(find /snap/eclipse -path "*/jre/bin/javac" 2>/dev/null | head -n 1 || true)
 if [ -n "$JUSTJ_JAVAC" ] && [ -x "$JUSTJ_JAVAC" ]; then
     JAVAC="$JUSTJ_JAVAC"
@@ -53,7 +84,6 @@ fi
 echo "-> Compilador: $JAVAC"
 echo "-> Ferramenta JAR: $JAR_BIN"
 
-# 2. Montar Classpath a partir dos plugins do Eclipse
 ECLIPSE_PLUGINS_DIR=""
 if [ -n "$ECLIPSE_HOME" ]; then
     if [ -d "$ECLIPSE_HOME/plugins" ]; then
@@ -88,23 +118,22 @@ for jar in "$ECLIPSE_PLUGINS_DIR"/org.eclipse.*.jar; do
     CP="$CP:$jar"
 done
 
-# 3. Atualizar versão no MANIFEST.MF
-sed -i "s/Bundle-Version: .*/Bundle-Version: ${VERSION}/" META-INF/MANIFEST.MF
+# Atualizar versão no MANIFEST.MF
+sed -i "s/Bundle-Version: .*/Bundle-Version: ${VERSION}.qualifier/" plugin/META-INF/MANIFEST.MF
 
-# 4. Compilar código fonte
 echo "-> Compilando fontes Java..."
 rm -rf "$BIN_DIR"/*
-SOURCES=$(find src -name "*.java")
+SOURCES=$(find plugin/src -name "*.java")
 "$JAVAC" -encoding UTF-8 -d "$BIN_DIR" -cp "$CP" $SOURCES
 
-# 5. Empacotar JAR OSGi
 echo "-> Empacotando bundle OSGi ($JAR_NAME)..."
 rm -f "$BUILD_DIR"/*.jar
-"$JAR_BIN" cvfm "$TARGET_JAR" META-INF/MANIFEST.MF -C "$BIN_DIR" . -C . plugin.xml -C . icons
+cd "$SCRIPT_DIR/plugin"
+"$JAR_BIN" cvfm "$TARGET_JAR" META-INF/MANIFEST.MF -C bin . -C . plugin.xml -C . icons
+cd "$SCRIPT_DIR"
 
 echo "-> Bundle gerado com sucesso em: $TARGET_JAR"
 
-# 6. Instalação se solicitado
 if [ "$INSTALL" = true ]; then
     echo "-> Instalando no Eclipse local..."
     INSTALL_DIR="/home/linux/snap/eclipse/common/eclipse/dropins"
@@ -115,19 +144,11 @@ if [ "$INSTALL" = true ]; then
     mkdir -p "$PLUGIN_INSTALL_DIR"
     cp -f "$TARGET_JAR" "$PLUGIN_INSTALL_DIR/"
 
-    CONFIG_INI="/home/linux/snap/eclipse/common/eclipse/configuration/config.ini"
-    if [ -f "$CONFIG_INI" ]; then
-        if ! grep -q "org.eclipse.equinox.p2.reconciler.dropins.directory" "$CONFIG_INI"; then
-            echo "org.eclipse.equinox.p2.reconciler.dropins.directory=/home/linux/snap/eclipse/common/eclipse/dropins" >> "$CONFIG_INI"
-            echo "-> Diretório dropins configurado no config.ini do Eclipse!"
-        fi
-    fi
-
     BUNDLES_INFO="/home/linux/snap/eclipse/common/eclipse/configuration/org.eclipse.equinox.simpleconfigurator/bundles.info"
     if [ -f "$BUNDLES_INFO" ]; then
         sed -i '/com\.deepseek\.everywhere/d' "$BUNDLES_INFO"
         echo "com.deepseek.everywhere,$VERSION,file:$PLUGIN_INSTALL_DIR/$JAR_NAME,4,false" >> "$BUNDLES_INFO"
-        echo "-> Bundle registrado no bundles.info do Eclipse com URI absoluta!"
+        echo "-> Bundle registrado no bundles.info do Eclipse!"
     fi
     echo "-> Instalação concluída no Eclipse! Reinicie o Eclipse para aplicar."
 fi

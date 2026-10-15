@@ -8,6 +8,7 @@
 [![Java Runtime](https://img.shields.io/badge/Java-17%2B%20%7C%2025-orange?logo=openjdk)](https://openjdk.org/)
 [![Embedded Browser](https://img.shields.io/badge/SWT%20Browser-WebKitGTK%20%7C%20Edge%20%7C%20WebKit-blue)]()
 [![DeepSeek](https://img.shields.io/badge/AI-DeepSeek--V3%20%7C%20DeepSeek--R1-007acc)](https://deepseek.com)
+[![Maven Tycho](https://img.shields.io/badge/Build-Eclipse%20Tycho%204.0.8-blue?logo=apachemaven)](https://github.com/eclipse-tycho/tycho)
 [![Status](https://img.shields.io/badge/Status-Ready-success)]()
 
 </div>
@@ -36,100 +37,102 @@ It embeds the official **DeepSeek Harness (`dsh`)** runtime inside a native Ecli
 - ⚙️ **Eclipse Preferences Page**: Fully integrated under `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
 - ⌨️ **Workbench Menu & Commands**: Dedicated `Everywhere` menu on the main menu bar to start, stop, and toggle the view.
 
-### 🚀 Build & Package
+---
+
+### 📦 Multi-Module Project Structure (Maven Tycho)
+
+The project is organized in a standard multi-module Tycho structure:
+
+```
+eclipse/
+├── pom.xml                                  # Root Parent POM (tycho-maven-plugin, target platforms, modules)
+├── plugin/                                  # Submodule 1: OSGi Plug-in bundle
+│   ├── pom.xml                              # packaging: eclipse-plugin
+│   ├── META-INF/
+│   │   └── MANIFEST.MF                      # OSGi Bundle manifest and dependencies
+│   ├── build.properties                     # PDE build configuration
+│   ├── plugin.xml                           # Extension points (Views, Menus, Commands, Preferences)
+│   ├── icons/                               # Icons (PNG and SVG)
+│   └── src/com/deepseek/everywhere/         # Java source files
+├── feature/                                 # Submodule 2: Eclipse Feature
+│   ├── pom.xml                              # packaging: eclipse-feature
+│   ├── feature.xml                          # Feature definition (id: com.deepseek.everywhere.feature)
+│   └── build.properties                     # Feature build properties
+└── repository/                              # Submodule 3: p2 Update Site Repository
+    ├── pom.xml                              # packaging: eclipse-repository (tycho-p2-repository-plugin)
+    └── category.xml                         # p2 Category definition for Eclipse Marketplace
+```
+
+---
+
+### 🚀 Building the p2 Update Site
 
 #### Prerequisites
-1. **Eclipse IDE 2026-09 (4.41.0)** or any compatible Eclipse distribution.
-2. **Java 17+** or **Java 25** (Eclipse bundled compiler is automatically detected).
+1. **Java JDK 17+** installed and set as default.
+2. **Apache Maven 3.8+** installed (`mvn -version`).
 3. **DeepSeek Harness CLI**:
    ```bash
    npm install -g @deepseek-ai/dsh
    ```
 
-#### Quick Build & Local Installation
-
-Inside the `eclipse` directory:
+#### Maven Build Command
+Inside the `eclipse` directory, run:
 
 ```bash
-# Add execution permissions (if needed)
-chmod +x build.sh
-
-# Build and install directly into your local Eclipse
-./build.sh --install
+mvn clean verify
 ```
 
-The script will:
-1. Detect the Java compiler (bundled in Eclipse or system JDK).
-2. Locate Eclipse target libraries (`org.eclipse.ui`, `swt`, `core.runtime`, etc.).
-3. Compile all source files under `eclipse/src/`.
-4. Package the OSGi bundle at `eclipse/build/com.deepseek.everywhere_1.0.0.jar`.
-5. Install into `dropins` and `plugins` folders, updating `bundles.info`.
+*(Optional: override target Eclipse mirror)*
+```bash
+mvn clean verify -Declipse.p2.repo.url=https://download.eclipse.org/releases/2024-06
+```
 
-#### Manual Installation
+#### 📁 Output Artifacts Location
 
-If you prefer copying the `.jar` bundle manually:
-1. Run `./build.sh` to produce the package.
-2. Copy the generated file:
+After the build completes successfully:
+- **p2 Update Site Directory**: `eclipse/repository/target/repository/`
+  Inside this directory, the following required p2 repository files are generated:
+  - `artifacts.jar` (or `artifacts.xml.xz`) — p2 artifact metadata repository
+  - `content.jar` (or `content.xml.xz`) — p2 content metadata repository
+  - `plugins/com.deepseek.everywhere_<version>.<timestamp>.jar` — compiled OSGi bundle
+  - `features/com.deepseek.everywhere.feature_<version>.<timestamp>.jar` — compiled Feature bundle
+- **Zipped Repository**: `eclipse/repository/target/com.deepseek.everywhere.repository-1.0.0-SNAPSHOT.zip`
+
+---
+
+### 🌐 Publishing to Eclipse Marketplace via GitHub Pages
+
+1. **Deploy to GitHub Pages (`gh-pages`)**:
+   Copy the contents of `eclipse/repository/target/repository/` to your `gh-pages` branch or repository `docs/` folder:
    ```bash
-   cp eclipse/build/com.deepseek.everywhere_1.0.0.jar <eclipse_path>/dropins/
+   # Example publishing to gh-pages branch:
+   git checkout -B gh-pages
+   cp -rf eclipse/repository/target/repository/* ./
+   git add -A
+   git commit -m "Deploy p2 Update Site v1.0.0"
+   git push origin gh-pages --force
    ```
-3. Start or restart Eclipse with `-clean`:
-   ```bash
-   eclipse -clean
-   ```
+   Your p2 update site URL will be:
+   `https://<username>.github.io/<repository-name>/`
 
-### 🎯 How to Use in Eclipse
+2. **Register on Eclipse Marketplace**:
+   - Access [Eclipse Marketplace Portal](https://marketplace.eclipse.org/).
+   - Create a listing for **Everywhere DeepSeek Harness**.
+   - In the **Update Site URL** field, enter your GitHub Pages URL:
+     `https://<username>.github.io/<repository-name>/`
+   - In the **Install Button / Feature ID** field, enter:
+     `com.deepseek.everywhere.feature.group`
 
-1. Open **Eclipse IDE**.
-2. Open the Everywhere view:
-   - Menu `Window` ➔ `Show View` ➔ `Other...`
-   - Expand the **Everywhere** category and select **Everywhere (DeepSeek Harness)**.
-   - Or click the DeepSeek icon on the top workbench toolbar.
-3. If **Auto Start** is enabled, DeepSeek Harness will boot automatically.
-4. To monitor diagnostics, switch to the **Console** view and select `Everywhere - DeepSeek Harness`.
-
-### ⚙️ Preferences (Window ➔ Preferences ➔ Everywhere)
-
-| Option | Default | Description |
-|---|---|---|
-| **Auto Start** | `true` | Automatically starts the agent when opening the View |
-| **HTTP Server Port** | `0` | Local port (0 assigns an available port automatically) |
-| **Harness Profile** | `"web"` | Execution profile (`web`, `headless`, `tui`) |
-| **DeepSeek API Key** | `""` | DeepSeek API key (also inherited from `DEEPSEEK_API_KEY`) |
-| **API Base URL** | `https://api.deepseek.com` | DeepSeek API endpoint base URL |
-| **Custom 'dsh' Path** | `""` | Custom binary path if `dsh` is not in standard PATH |
-
-### 🏛️ Architecture & Project Structure
-
-```
-eclipse/
-├── .classpath                   # Eclipse PDE classpath configuration
-├── .project                     # Eclipse project descriptor
-├── build.properties             # PDE build configuration
-├── build.sh                     # Compilation and auto-installation script
-├── pom.xml                      # Maven Tycho configuration
-├── plugin.xml                   # Views, Menus, Commands, and Preferences registry
-├── META-INF/
-│   └── MANIFEST.MF              # OSGi Bundle manifest and dependencies
-├── icons/                       # Action and view icons (PNG and SVG)
-└── src/com/deepseek/everywhere/
-    ├── Activator.java           # Bundle lifecycle and cleanup on Eclipse shutdown
-    ├── actions/                 # Toolbar actions (Start, Stop, Restart, etc.)
-    ├── console/                 # Integration with Eclipse MessageConsole
-    ├── handlers/                # Workbench command handlers
-    ├── model/                   # State enums and listener interfaces
-    ├── preferences/             # Preference pages and default initializers
-    ├── service/                 # Process lifecycle and resilience manager (DshManager)
-    └── ui/                      # SWT Browser view integration (EverywhereView)
-```
+3. **Install in Eclipse**:
+   In Eclipse IDE: `Help` ➔ `Install New Software...` ➔ Add your GitHub Pages URL ➔ Select **Everywhere - AI & DeepSeek Harness** ➔ Follow the wizard.
 
 ---
 
 ## 🇧🇷 Português
 
-Esta é a extensão oficial do **Everywhere** desenvolvida para o **Eclipse IDE**, com suporte nativo e validado para **Eclipse IDE for Java Developers (2026-09 / 4.41.0, Build id: 20260903-0720)** e versões compatíveis.
+Esta é a extensão oficial do **Everywhere** desenvolvida para o **Eclipse IDE**, com suporte nativo e validado para **Eclipse IDE for Java Developers (2026-09 / 4.41.0)** e versões compatíveis.
 
-Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nativa do Eclipse utilizando o widget **SWT Browser**, conectando os modelos autônomos **DeepSeek-V3** e **DeepSeek-R1** diretamente ao seu workspace de desenvolvimento.
+Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nativa do Eclipse utilizando o widget **SWT Browser**, conectando os modelos autônomos **DeepSeek-V3** e **DeepSeek-R1 (Reasoner)** diretamente ao seu workspace de desenvolvimento.
 
 ### 🌟 Funcionalidades
 
@@ -147,92 +150,69 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nati
 - ⚙️ **Página de Preferências do Eclipse**: Integrada ao menu padrão `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
 - ⌨️ **Menu e Atalhos no Workbench**: Menu `Everywhere` na barra principal com comandos para iniciar, parar e abrir a visão.
 
-### 🚀 Como Compilar e Empacotar o Plugin
+---
 
-#### Pré-requisitos
-1. **Eclipse IDE 2026-09 (4.41.0)** ou qualquer instalação Eclipse compatível.
-2. **Java 17+** ou **Java 25** (o compilador bundled do Eclipse é detectado automaticamente).
-3. **DeepSeek Harness CLI**:
-   ```bash
-   npm install -g @deepseek-ai/dsh
-   ```
+### 📦 Estrutura Multi-Módulo (Maven Tycho)
 
-#### Compilação e Instalação Rápida
+O projeto está estruturado em 3 submódulos padrão Tycho:
 
-Dentro do diretório `eclipse`:
+1. **`plugin/` (`com.deepseek.everywhere`)**: Submódulo com packaging `eclipse-plugin`. Contém o código Java, `MANIFEST.MF` OSGi, `plugin.xml` e ícones.
+2. **`feature/` (`com.deepseek.everywhere.feature`)**: Submódulo com packaging `eclipse-feature`. Contém o `feature.xml` que agrupa e referencia o plugin principal.
+3. **`repository/` (`com.deepseek.everywhere.repository`)**: Submódulo com packaging `eclipse-repository`. Contém o `category.xml` organizando a Feature dentro de uma categoria legível e empacota o p2 Update Site completo.
+
+---
+
+### 🚀 Como Compilar e Gerar o p2 Update Site
+
+#### Comando de Build Maven
+No diretório `eclipse/`:
 
 ```bash
-# Dar permissão de execução (se necessário)
-chmod +x build.sh
-
-# Compilar e instalar diretamente no Eclipse local
-./build.sh --install
+mvn clean verify
 ```
 
-O script irá:
-1. Detectar o compilador Java (bundled no Eclipse ou JDK do sistema).
-2. Localizar as bibliotecas do Eclipse (`org.eclipse.ui`, `swt`, `core.runtime`, etc.).
-3. Compilar os arquivos fontes em `eclipse/src/`.
-4. Gerar o pacote OSGi `eclipse/build/com.deepseek.everywhere_1.0.0.jar`.
-5. Instalar nas pastas `dropins` e `plugins` da sua instalação Eclipse, registrando no `bundles.info`.
+*(Caso precise especificar outro espelho p2 de destino)*:
+```bash
+mvn clean verify -Declipse.p2.repo.url=https://download.eclipse.org/releases/2024-06
+```
 
-#### Instalação Manual
+#### 📁 Diretório de Saída dos Artefatos p2
 
-Se preferir copiar manualmente o arquivo `.jar`:
+Ao término do comando `mvn clean verify`, os artefatos finais são gerados no seguinte diretório:
 
-1. Gere o pacote executando `./build.sh`.
-2. Copie o arquivo gerado:
+```
+eclipse/repository/target/repository/
+```
+
+Dentro desta pasta estarão os artefatos essenciais do p2 Update Site:
+- 📄 `artifacts.jar` (índice de metadados dos artefatos)
+- 📄 `content.jar` (índice de metadados de capacidades e dependências)
+- 📁 `plugins/` (contendo `com.deepseek.everywhere_<versão>.<timestamp>.jar`)
+- 📁 `features/` (contendo `com.deepseek.everywhere.feature_<versão>.<timestamp>.jar`)
+- 📦 Arquivo ZIP completo: `eclipse/repository/target/com.deepseek.everywhere.repository-1.0.0-SNAPSHOT.zip`
+
+---
+
+### 🌐 Publicação no GitHub Pages e Eclipse Marketplace
+
+1. **Publicar no GitHub Pages**:
+   Envie o conteúdo de `eclipse/repository/target/repository/` para o branch `gh-pages` ou pasta `docs/` do seu repositório:
    ```bash
-   cp eclipse/build/com.deepseek.everywhere_1.0.0.jar <caminho_do_eclipse>/dropins/
+   git checkout -B gh-pages
+   cp -rf eclipse/repository/target/repository/* ./
+   git add -A
+   git commit -m "Publicação p2 Update Site Everywhere DeepSeek"
+   git push origin gh-pages --force
    ```
-   *(No Snap do Ubuntu, o diretório é: `~/snap/eclipse/common/eclipse/dropins/`)*
-3. Inicie ou reinicie o Eclipse com o parâmetro `-clean` se necessário:
-   ```bash
-   eclipse -clean
-   ```
+   A URL do seu Update Site será:
+   `https://<usuario>.github.io/<repositorio>/`
 
-### 🎯 Como Usar no Eclipse
+2. **Cadastrar no Eclipse Marketplace**:
+   - Faça login no [Eclipse Marketplace Portal](https://marketplace.eclipse.org/).
+   - Preencha o cadastro da sua solução **Everywhere DeepSeek Harness**.
+   - No campo **Update Site URL**, informe o link do GitHub Pages.
+   - No campo **Feature ID / Install Button**, utilize: `com.deepseek.everywhere.feature.group`.
 
-1. Abra o **Eclipse IDE 2026-09**.
-2. Abra a visão Everywhere:
-   - Menu `Window` ➔ `Show View` ➔ `Other...`
-   - Expanda a categoria **Everywhere** e selecione **Everywhere (DeepSeek Harness)**.
-   - Ou clique no ícone do DeepSeek na barra de ferramentas superior.
-3. Se a opção **Auto Start** estiver habilitada, o DeepSeek Harness iniciará automaticamente.
-4. Caso esteja parado, clique no botão **▶ Iniciar DeepSeek Harness** na tela inicial ou na barra de ações.
-5. Para acompanhar diagnósticos, abra a visualização **Console** e selecione o console `Everywhere - DeepSeek Harness`.
-
-### ⚙️ Configurações (Window ➔ Preferences ➔ Everywhere)
-
-| Opção | Padrão | Descrição |
-|---|---|---|
-| **Iniciar automaticamente** | `true` | Inicia o runtime automaticamente ao abrir a visão |
-| **Porta do Servidor HTTP** | `0` | Porta local (0 atribui porta livre automaticamente) |
-| **Perfil do Harness** | `"web"` | Perfil de inicialização do DeepSeek Harness (`web`, `headless`, `tui`) |
-| **DeepSeek API Key** | `""` | Chave de API DeepSeek (também herdada de `DEEPSEEK_API_KEY`) |
-| **URL Base da API** | `https://api.deepseek.com` | Endpoint da API DeepSeek |
-| **Caminho customizado 'dsh'** | `""` | Caminho personalizado para o binário `dsh` caso não esteja no PATH |
-
-### 🏛️ Estrutura do Código
-
-```
-eclipse/
-├── .classpath                   # Configuração de classpath do Eclipse PDE
-├── .project                     # Configuração de projeto do Eclipse
-├── build.properties             # Descritor de build PDE
-├── build.sh                     # Script de compilação e auto-instalação
-├── pom.xml                      # Configuração para Maven Tycho
-├── plugin.xml                   # Registro de Views, Menus, Commands e Preferences
-├── META-INF/
-│   └── MANIFEST.MF              # Manifesto OSGi com dependências do Eclipse
-├── icons/                       # Ícones de ações e janelas (PNG e SVG)
-└── src/com/deepseek/everywhere/
-    ├── Activator.java           # Ciclo de vida do bundle e limpeza ao fechar o Eclipse
-    ├── actions/                 # Ações da barra de ferramentas (Start, Stop, Restart, etc.)
-    ├── console/                 # Integração com MessageConsole do Eclipse
-    ├── handlers/                # Manipuladores de comandos do Workbench
-    ├── model/                   # Enums de estado e interfaces de ouvintes
-    ├── preferences/             # Páginas e inicializadores de configurações
-    ├── service/                 # Gerenciador de ciclo de vida e resiliência de processos (DshManager)
-    └── ui/                      # Visualização SWT com navegador embutido (EverywhereView)
-```
+3. **Instalação no Eclipse IDE**:
+   - No Eclipse: `Help` ➔ `Install New Software...`
+   - Adicione a URL do GitHub Pages e selecione a categoria **Everywhere - AI & DeepSeek Harness**.

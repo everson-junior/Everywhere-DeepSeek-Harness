@@ -10,6 +10,14 @@
 [![DeepSeek](https://img.shields.io/badge/AI-DeepSeek--V3%20%7C%20DeepSeek--R1-007acc)](https://deepseek.com)
 [![Status](https://img.shields.io/badge/Status-Ready-success)]()
 
+<br/>
+
+<div align="center">
+  <a href="https://marketplace.eclipse.org/content/everywhere-deepseek-harness">
+    <img src="https://marketplace.eclipse.org/sites/all/modules/custom/marketplace/images/installbutton.png" alt="Drag and drop into a running Eclipse IDE to install"/>
+  </a>
+</div>
+
 </div>
 
 ---

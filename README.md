@@ -8,7 +8,7 @@
 
 [![VS Code Extension](https://img.shields.io/badge/VS%20Code-Extension-blue?logo=visualstudiocode)](./vscode)
 [![Visual Studio 2022](https://img.shields.io/badge/Visual%20Studio-2022%20(v17.0%2B)-purple?logo=visualstudio)](./visualstudio)
-[![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-2024.1%2B-red?logo=intellijidea)](./intellij)
+[![IntelliJ IDEA](https://img.shields.io/badge/IntelliJ%20IDEA-JetBrains%20Marketplace%20%2335191-fe2857?logo=intellijidea)](https://plugins.jetbrains.com/plugin/35191)
 [![Eclipse IDE](https://img.shields.io/badge/Eclipse%20IDE-2026--09%20(4.41.0)-2c2255?logo=eclipseide)](./eclipse)
 [![DeepSeek](https://img.shields.io/badge/AI-DeepSeek--V3%20%7C%20DeepSeek--R1-007acc)](https://deepseek.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -46,13 +46,16 @@ With Everywhere, **DeepSeek-V3** and **DeepSeek-R1 (Reasoner)** models gain supe
 |---|---|---|---|
 | **VS Code** | TypeScript, Webview | Visual Studio Marketplace (`.vsix`) | [VS Code README](./vscode/README.md) |
 | **Visual Studio 2022** | C#, WPF, Microsoft Edge WebView2 | Visual Studio Marketplace (`.vsix`) | [Visual Studio README](./visualstudio/README.md) |
-| **IntelliJ IDEA** | Kotlin, Gradle, JCEF Chromium | JetBrains Plugin (`.zip`) | [IntelliJ README](./intellij/README.md) |
+| **IntelliJ IDEA** | Kotlin, Gradle, JCEF Chromium | [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/35191) (Plugin #35191) | [IntelliJ README](./intellij/README.md) |
 | **Eclipse IDE** | Java 17+, OSGi Tycho, SWT Browser | [Eclipse Marketplace](https://marketplace.eclipse.org/content/everywhere-deepseek-harness) (p2 Site) | [Eclipse README](./eclipse/README.md) |
 
 <br/>
 
-<div align="center">
-  <a href="https://marketplace.eclipse.org/content/everywhere-deepseek-harness">
+<div align="center" style="display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap;">
+  <a href="https://plugins.jetbrains.com/plugin/35191" target="_blank" rel="noopener">
+    <img src="https://img.shields.io/badge/JetBrains%20Marketplace-Install%20in%20IntelliJ-fe2857?style=for-the-badge&logo=intellijidea&logoColor=white" alt="Install Everywhere in IntelliJ IDEA from JetBrains Marketplace"/>
+  </a>
+  <a href="https://marketplace.eclipse.org/content/everywhere-deepseek-harness" target="_blank" rel="noopener">
     <img src="https://marketplace.eclipse.org/sites/all/modules/custom/marketplace/images/installbutton.png" alt="Drag and drop into a running Eclipse IDE to install Everywhere DeepSeek Harness in Eclipse"/>
   </a>
 </div>
@@ -85,7 +88,7 @@ Com isso, os modelos **DeepSeek-V3** e **DeepSeek-R1 (Reasoner)** ganham acesso 
 |---|---|---|---|
 | **VS Code** | TypeScript, Webview | Visual Studio Marketplace (`.vsix`) | [README do VS Code](./vscode/README.md) |
 | **Visual Studio 2022** | C#, WPF, Microsoft Edge WebView2 | Visual Studio Marketplace (`.vsix`) | [README do Visual Studio](./visualstudio/README.md) |
-| **IntelliJ IDEA** | Kotlin, Gradle, JCEF Chromium | Plugin JetBrains (`.zip`) | [README do IntelliJ](./intellij/README.md) |
+| **IntelliJ IDEA** | Kotlin, Gradle, JCEF Chromium | [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/35191) (Plugin #35191) | [README do IntelliJ](./intellij/README.md) |
 | **Eclipse IDE** | Java 17+, OSGi PDE, SWT Browser | Plugin Eclipse (`.jar`) | [README do Eclipse](./eclipse/README.md) |
 
 ---

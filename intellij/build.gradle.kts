@@ -37,6 +37,10 @@ tasks {
         """.trimIndent())
     }
 
+    publishPlugin {
+        token.set(System.getenv("INTELLIJ_MARKETPLACE_TOKEN"))
+    }
+
     buildSearchableOptions {
         enabled = false
     }

@@ -13,7 +13,7 @@ on:
         required: false
         default: ''
       publish_marketplace:
-        description: 'Publicar no Visual Studio Marketplace?'
+        description: 'Publicar nos Marketplaces oficiais (VS Code, Visual Studio, JetBrains Marketplace)?'
         required: false
         type: boolean
         default: true
@@ -410,6 +410,8 @@ jobs:
     name: Build IntelliJ IDEA Plugin
     needs: get-version
     runs-on: ubuntu-latest
+    env:
+      INTELLIJ_MARKETPLACE_TOKEN: ${{ secrets.INTELLIJ_MARKETPLACE_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -443,6 +445,19 @@ jobs:
           files: intellij/build/distributions/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to JetBrains Marketplace
+        if: ${{ env.INTELLIJ_MARKETPLACE_TOKEN != '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace != false) }}
+        working-directory: intellij
+        run: |
+          echo "🚀 Publicando plugin no JetBrains Marketplace..."
+          ./gradlew publishPlugin -PpluginVersion=${{ needs.get-version.outputs.version }} --no-daemon
+          echo "✅ Publicação no JetBrains Marketplace concluída com sucesso!"
+
+      - name: Marketplace Notice (quando INTELLIJ_MARKETPLACE_TOKEN não estiver configurado)
+        if: ${{ env.INTELLIJ_MARKETPLACE_TOKEN == '' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.publish_marketplace != false) }}
+        run: |
+          echo "::notice title=JetBrains Marketplace Skipped::O arquivo .zip do plugin IntelliJ foi gerado e anexado aos artefatos da Release. Para habilitar a publicação automática no JetBrains Marketplace, adicione o secret 'INTELLIJ_MARKETPLACE_TOKEN' nas configurações do repositório (Settings -> Secrets and variables -> Actions)."
 
   # -------------------------------------------------------------
   # 4. Eclipse IDE Plugin & p2 Update Site (GitHub Pages)

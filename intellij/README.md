@@ -7,6 +7,7 @@
 [![IntelliJ IDEA 2024.1+](https://img.shields.io/badge/IntelliJ%20IDEA-2024.1.2%20(Community%20%7C%20Ultimate)-red?logo=intellijidea)](https://www.jetbrains.com/idea/)
 [![Java Runtime](https://img.shields.io/badge/Java-17-orange?logo=openjdk)](https://openjdk.org/)
 [![Embedded Browser](https://img.shields.io/badge/Webview-JCEF%20(Chromium)-teal)]()
+[![JetBrains Marketplace](https://img.shields.io/badge/JetBrains%20Marketplace-Plugin%2035191-orange?logo=jetbrains)](https://plugins.jetbrains.com/plugin/35191)
 [![DeepSeek](https://img.shields.io/badge/AI-DeepSeek--V3%20%7C%20DeepSeek--R1-007acc)](https://deepseek.com)
 
 </div>
@@ -76,6 +77,14 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 
 ### 📦 How to Install the Plugin in IntelliJ IDEA
 
+#### Method 1: Official JetBrains Marketplace (Recommended)
+1. Directly via Marketplace: Open [Everywhere on JetBrains Marketplace (Plugin #35191)](https://plugins.jetbrains.com/plugin/35191) and click **Install to IntelliJ IDEA**.
+2. Or inside IntelliJ IDEA:
+   - Go to `Settings` (`Ctrl + Alt + S` / `Cmd + ,`) ➔ **Plugins**.
+   - In the **Marketplace** tab, search for `Everywhere DeepSeek Harness`.
+   - Click **Install** and restart if prompted.
+
+#### Method 2: Install from Disk (ZIP)
 1. In IntelliJ IDEA, open Settings:
    - **Windows/Linux**: `File` ➔ `Settings...` (`Ctrl + Alt + S`).
    - **macOS**: `IntelliJ IDEA` ➔ `Settings...` (`Cmd + ,`).
@@ -168,6 +177,14 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 
 ### 📦 Como Instalar o Plugin no IntelliJ IDEA
 
+#### Método 1: JetBrains Marketplace Oficial (Recomendado)
+1. Pela página oficial do Marketplace: Acesse [Everywhere no JetBrains Marketplace (Plugin #35191)](https://plugins.jetbrains.com/plugin/35191) e clique em **Install to IntelliJ IDEA**.
+2. Ou diretamente pelo IntelliJ IDEA:
+   - Abra `Settings` / `Preferências` (`Ctrl + Alt + S` ou `Cmd + ,`) ➔ **Plugins**.
+   - Na aba **Marketplace**, pesquise por `Everywhere DeepSeek Harness`.
+   - Clique em **Install** e reinicie a IDE se solicitado.
+
+#### Método 2: Instalar a partir do Arquivo Local (ZIP)
 1. No IntelliJ IDEA, acesse as preferências:
    - **Windows/Linux**: `File` ➔ `Settings...` (atalho `Ctrl + Alt + S`).
    - **macOS**: `IntelliJ IDEA` ➔ `Settings...` (atalho `Cmd + ,`).

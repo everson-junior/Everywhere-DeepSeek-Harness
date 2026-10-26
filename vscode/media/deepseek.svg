@@ -1,18 +1,152 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-  <!-- Contorno do coração conectado -->
-  <path d="M8 3.5C7.2 2 5.2 1.3 3.5 2.2 1.8 3.1 1.2 5.2 2 7c1 2.2 4.5 5.5 5.8 6.7.1.1.3.1.4 0 .5-.5 1.6-1.5 2.8-2.7" 
-        stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="143 160 595 595" width="24" height="24">
+  <defs>
+    <!-- Engrenagem Pequena Reutilizável -->
+    <g id="gear-small">
+      <circle cx="0" cy="0" r="24" fill="none" stroke="currentColor" stroke-width="14" />
+      <g fill="currentColor">
+        <rect x="-7" y="-38" width="14" height="16" rx="3" />
+        <rect x="-7" y="22" width="14" height="16" rx="3" />
+        <rect x="-38" y="-7" width="16" height="14" rx="3" />
+        <rect x="22" y="-7" width="16" height="14" rx="3" />
+        <rect x="-7" y="-38" width="14" height="16" rx="3" transform="rotate(45)" />
+        <rect x="-7" y="22" width="14" height="16" rx="3" transform="rotate(45)" />
+        <rect x="-38" y="-7" width="16" height="14" rx="3" transform="rotate(45)" />
+        <rect x="22" y="-7" width="16" height="14" rx="3" transform="rotate(45)" />
+      </g>
+    </g>
 
-  <!-- Balão de Chat -->
-  <path d="M9.5 7.5C9.5 6.4 10.8 5.5 12.5 5.5s3 0.9 3 2c0 0.5-.3 1-.8 1.4l.3 1.6-1.5-.6c-.3.1-.7.1-1 .1-1.7 0-3-.9-3-2z" 
-        fill="currentColor"/>
+    <!-- Máscara para vazar os detalhes internos da metade esquerda do coração -->
+    <mask id="heart-left-cutout">
+      <rect width="800" height="800" fill="white" />
+      
+      <!-- Recorte da Engrenagem Grande Interna -->
+      <g transform="translate(256, 312)">
+        <circle cx="0" cy="0" r="44" fill="none" stroke="black" stroke-width="20" />
+        <circle cx="0" cy="0" r="16" fill="black" />
+        <g fill="black">
+          <rect x="-11" y="-68" width="22" height="24" rx="4" />
+          <rect x="-11" y="44" width="22" height="24" rx="4" />
+          <rect x="-68" y="-11" width="24" height="22" rx="4" />
+          <rect x="44" y="-11" width="24" height="22" rx="4" />
+          <rect x="-11" y="-68" width="22" height="24" rx="4" transform="rotate(45)" />
+          <rect x="-11" y="44" width="22" height="24" rx="4" transform="rotate(45)" />
+          <rect x="-68" y="-11" width="24" height="22" rx="4" transform="rotate(45)" />
+          <rect x="44" y="-11" width="24" height="22" rx="4" transform="rotate(45)" />
+        </g>
+      </g>
+
+      <!-- Recorte da Engrenagem Pequena Interna -->
+      <g transform="translate(264, 458) scale(0.85)">
+        <circle cx="0" cy="0" r="24" fill="none" stroke="black" stroke-width="14" />
+        <g fill="black">
+          <rect x="-7" y="-38" width="14" height="16" rx="3" />
+          <rect x="-7" y="22" width="14" height="16" rx="3" />
+          <rect x="-38" y="-7" width="16" height="14" rx="3" />
+          <rect x="22" y="-7" width="16" height="14" rx="3" />
+          <rect x="-7" y="-38" width="14" height="16" rx="3" transform="rotate(45)" />
+          <rect x="-7" y="22" width="14" height="16" rx="3" transform="rotate(45)" />
+          <rect x="-38" y="-7" width="16" height="14" rx="3" transform="rotate(45)" />
+          <rect x="22" y="-7" width="16" height="14" rx="3" transform="rotate(45)" />
+        </g>
+      </g>
+
+      <!-- Recorte das Trilhas Internas Esquerda -->
+      <polyline points="165,408 212,408" fill="none" stroke="black" stroke-width="14" stroke-linecap="round" />
+      <circle cx="228" cy="408" r="13" fill="none" stroke="black" stroke-width="12" />
+      <polyline points="242,408 282,408 298,395 322,395" fill="none" stroke="black" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+
+      <polyline points="330,212 330,248" fill="none" stroke="black" stroke-width="14" stroke-linecap="round" />
+      <circle cx="330" cy="262" r="12" fill="none" stroke="black" stroke-width="12" />
+      <polyline points="342,265 365,288 365,328" fill="none" stroke="black" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Recorte da Engrenagem Central sobre a metade esquerda -->
+      <circle cx="398" cy="395" r="88" fill="black" />
+    </mask>
+
+    <!-- Máscara para vazar os 3 pontos do balão de conversação -->
+    <mask id="chat-cutout">
+      <rect width="800" height="800" fill="white" />
+      <circle cx="558" cy="576" r="18" fill="black" />
+      <circle cx="608" cy="576" r="18" fill="black" />
+      <circle cx="658" cy="576" r="18" fill="black" />
+    </mask>
+  </defs>
+
   
-  <!-- Pontos do chat adaptados ao fundo do tema -->
-  <circle cx="11.2" cy="7.5" r="0.4" fill="var(--vscode-sideBar-background, #1e1e1e)"/>
-  <circle cx="12.5" cy="7.5" r="0.4" fill="var(--vscode-sideBar-background, #1e1e1e)"/>
-  <circle cx="13.8" cy="7.5" r="0.4" fill="var(--vscode-sideBar-background, #1e1e1e)"/>
+ <!-- ==================== METADE ESQUERDA DO CORAÇÃO (PREENCHIDA E VAZADA) ==================== -->
+  <path d="M 398 265 
+           C 365 190, 265 170, 200 225 
+           C 130 285, 135 395, 255 528 
+           L 345 452 
+           L 398 395 Z" fill="currentColor" stroke="currentColor" stroke-width="12" stroke-linejoin="round" mask="url(#heart-left-cutout)" />
 
-  <!-- Núcleo do processador / motor local -->
-  <rect x="4.5" y="4.5" width="2.5" height="2.5" rx="0.5" fill="currentColor"/>
-  <path d="M5.7 3.5v1M5.7 7v1M3.5 5.7h1M7 5.7h1" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- ==================== LADO DIREITO E INFERIOR DO CORAÇÃO (CIRCUITOS) ==================== -->
+  <path d="M 398 265 C 430 195, 520 175, 588 210" fill="none" stroke="currentColor" stroke-width="18" stroke-linecap="round" />
+
+  <path d="M 628 245 C 685 335, 650 455, 535 562 L 398 662 L 292 568" fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Trilhas Verticais na Ponta Inferior -->
+  <line x1="398" y1="470" x2="398" y2="652" stroke="currentColor" stroke-width="15" stroke-linecap="round" />
+  
+  <line x1="360" y1="475" x2="360" y2="520" stroke="currentColor" stroke-width="13" stroke-linecap="round" />
+  <circle cx="360" cy="534" r="12" fill="none" stroke="currentColor" stroke-width="10" />
+  <line x1="360" y1="548" x2="360" y2="625" stroke="currentColor" stroke-width="13" stroke-linecap="round" />
+  
+  <polyline points="315,530 315,585" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round" />
+
+  <line x1="434" y1="475" x2="434" y2="520" stroke="currentColor" stroke-width="13" stroke-linecap="round" />
+  <circle cx="434" cy="534" r="12" fill="none" stroke="currentColor" stroke-width="10" />
+  <line x1="434" y1="548" x2="434" y2="625" stroke="currentColor" stroke-width="13" stroke-linecap="round" />
+  
+  <polyline points="472,600 472,532 490,515" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Trilhas Superiores e Laterais Direitas -->
+  <polyline points="455,212 455,268 428,302" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="494,200 494,250" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" />
+  <circle cx="494" cy="264" r="13" fill="none" stroke="currentColor" stroke-width="10" />
+  <polyline points="484,274 452,315" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" />
+
+  <circle cx="546" cy="242" r="16" fill="currentColor" />
+
+  <!-- Trilhas Horizontais Direitas -->
+  <polyline points="485,382 555,382 588,350" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="598" cy="340" r="12" fill="none" stroke="currentColor" stroke-width="10" />
+
+  <polyline points="485,416 595,416" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round" />
+  <circle cx="610" cy="416" r="13" fill="none" stroke="currentColor" stroke-width="10" />
+
+  <!-- Engrenagem Direita Inferior -->
+  <g transform="translate(508, 476) scale(1.08)">
+    <use href="#gear-small" />
+  </g>
+
+  <!-- ==================== ENGRENAGEM CENTRAL E FEIXE DIAGONAL ==================== -->
+  <g transform="translate(398, 395)">
+    <g fill="currentColor">
+      <rect x="-15" y="-84" width="30" height="28" rx="5" />
+      <rect x="-15" y="56" width="30" height="28" rx="5" />
+      <rect x="-84" y="-15" width="28" height="30" rx="5" />
+      <rect x="56" y="-15" width="28" height="30" rx="5" />
+      <rect x="-15" y="-84" width="30" height="28" rx="5" transform="rotate(45)" />
+      <rect x="-15" y="56" width="30" height="28" rx="5" transform="rotate(45)" />
+      <rect x="-84" y="-15" width="28" height="30" rx="5" transform="rotate(45)" />
+      <rect x="56" y="-15" width="28" height="30" rx="5" transform="rotate(45)" />
+    </g>
+    <circle cx="0" cy="0" r="62" fill="none" stroke="currentColor" stroke-width="24" />
+    <circle cx="0" cy="0" r="30" fill="none" stroke="currentColor" stroke-width="12" />
+  </g>
+
+
+
+  <!-- ==================== BALÃO DE CONVERSAÇÃO (INFERIOR DIREITO) ==================== -->
+  <path d="M 625 468 
+           L 668 468 
+           C 708 468, 730 495, 730 538 
+           L 730 605 
+           C 730 638, 708 658, 682 664 
+           L 682 726 
+           L 605 668 
+           L 535 668 
+           C 505 668, 482 648, 474 625 
+           Z" fill="currentColor" stroke="currentColor" stroke-width="12" stroke-linejoin="round" mask="url(#chat-cutout)" />
 </svg>

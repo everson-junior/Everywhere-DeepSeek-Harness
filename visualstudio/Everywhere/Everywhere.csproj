@@ -24,8 +24,8 @@
     <Nullable>enable</Nullable>
     <Authors>EverDock</Authors>
     <Company>EverDock</Company>
-    <Product>Everywhere DeepSeek Harness</Product>
-    <Description>Run official DeepSeek Harness autonomous AI agents directly inside Visual Studio 2022.</Description>
+    <Product>EveryWhere Harness</Product>
+    <Description>Run official EveryWhere Harness autonomous AI agents directly inside Visual Studio 2022.</Description>
     <Version>0.1.0</Version>
   </PropertyGroup>
 

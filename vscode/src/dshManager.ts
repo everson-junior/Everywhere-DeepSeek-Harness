@@ -27,11 +27,15 @@ function getSessionFilePath(storageRoot?: string): string {
     }
   }
   const home = homedir()
+  const ewhDir = join(home, '.ewh')
+  if (existsSync(ewhDir)) {
+    return join(ewhDir, 'last-session.json')
+  }
   const dshDir = join(home, '.dsh')
   if (existsSync(dshDir)) {
     return join(dshDir, 'last-session.json')
   }
-  return join(home, '.dsh-last-session.json')
+  return join(home, '.ewh-last-session.json')
 }
 
 export function saveLastSession(
@@ -62,18 +66,25 @@ export function loadLastSession(storageRoot?: string): SavedSession | undefined 
 }
 
 export function getDshSecret(): Buffer | undefined {
-  const credPath = join(homedir(), '.dsh', '.credentials.yaml')
-  if (!existsSync(credPath)) return undefined
-  try {
-    const content = readFileSync(credPath, 'utf8')
-    const match = content.match(/client-connection\/browser-session:[\s\S]*?secret:\s*([A-Za-z0-9_-]+)/)
-    if (!match) return undefined
-    const secretStr = match[1]
-    const padding = '='.repeat((4 - (secretStr.length % 4)) % 4)
-    return Buffer.from(secretStr.replaceAll('-', '+').replaceAll('_', '/') + padding, 'base64')
-  } catch {
-    return undefined
+  const candidatePaths = [
+    join(homedir(), '.ewh', '.credentials.yaml'),
+    join(homedir(), '.dsh', '.credentials.yaml'),
+  ]
+  for (const credPath of candidatePaths) {
+    if (!existsSync(credPath)) continue
+    try {
+      const content = readFileSync(credPath, 'utf8')
+      const match = content.match(/client-connection\/browser-session:[\s\S]*?secret:\s*([A-Za-z0-9_-]+)/)
+      if (match) {
+        const secretStr = match[1]
+        const padding = '='.repeat((4 - (secretStr.length % 4)) % 4)
+        return Buffer.from(secretStr.replaceAll('-', '+').replaceAll('_', '/') + padding, 'base64')
+      }
+    } catch {
+      // Continue to next candidate
+    }
   }
+  return undefined
 }
 
 export function generateDshSessionCookie(authority: string, secret: Buffer): string {
@@ -257,7 +268,7 @@ async function stopProcessOnPort(
   const pid = await findProcessIdOnPort(port)
   if (!pid || pid === excludedPid) return
 
-  outputChannel.appendLine(`[DeepSeek Harness] Stopping process ${pid} listening on port ${port}...`)
+  outputChannel.appendLine(`[EveryWhere Harness] Stopping process ${pid} listening on port ${port}...`)
   await new Promise<void>((resolveStop) => {
     if (process.platform === 'win32') {
       execFile('taskkill.exe', ['/PID', String(pid), '/T', '/F'], () => resolveStop())
@@ -281,16 +292,17 @@ async function stopOrphanDshProcesses(
   }
 
   if (process.platform === 'win32') {
+    execFile('taskkill.exe', ['/IM', 'ewh.exe', '/F'], () => {})
     execFile('taskkill.exe', ['/IM', 'dsh.exe', '/F'], () => {})
   } else {
     await new Promise<void>((resolveStop) => {
-      execFile('pgrep', ['-f', 'dsh.*--profile'], { encoding: 'utf8' }, async (_err, stdout) => {
+      execFile('pgrep', ['-f', '(ewh|dsh).*--profile'], { encoding: 'utf8' }, async (_err, stdout) => {
         if (stdout) {
           const lines = stdout.split(/\r?\n/)
           for (const line of lines) {
             const pid = Number(line.trim())
             if (Number.isInteger(pid) && pid > 0 && pid !== excludedPid && pid !== process.pid) {
-              outputChannel.appendLine(`[DeepSeek Harness] Stopping orphan DSH process ${pid}...`)
+              outputChannel.appendLine(`[EveryWhere Harness] Stopping orphan process ${pid}...`)
               try {
                 process.kill(pid, 'SIGTERM')
               } catch {
@@ -318,9 +330,11 @@ function resolveEnhancedEnv(userConfig: ExtensionConfig): NodeJS.ProcessEnv {
   }
 
   if (userConfig.apiKey) {
+    env.EVERYWHERE_API_KEY = userConfig.apiKey
     env.DEEPSEEK_API_KEY = userConfig.apiKey
   }
   if (userConfig.baseUrl) {
+    env.EVERYWHERE_BASE_URL = userConfig.baseUrl
     env.DEEPSEEK_BASE_URL = userConfig.baseUrl
   }
 
@@ -378,7 +392,7 @@ function resolveEnhancedEnv(userConfig: ExtensionConfig): NodeJS.ProcessEnv {
 }
 
 /**
- * Resolves the executable command and arguments for booting the DeepSeek Harness.
+ * Resolves the executable command and arguments for booting EveryWhere Harness.
  */
 export function resolveHarnessCommand(
   config: ExtensionConfig,
@@ -401,40 +415,44 @@ export function resolveHarnessCommand(
   }
 
   const nodeBin = findNodeBinary()
+  const isWin = process.platform === 'win32'
+  const candidateBinNames = isWin ? ['ewh.cmd', 'dsh.cmd'] : ['ewh', 'dsh']
 
   // 2. Extension private storage installation (isolated auto-install without sudo)
   if (storageRoot) {
-    const isWin = process.platform === 'win32'
-    const storageBin = join(storageRoot, 'node_modules', '.bin', isWin ? 'dsh.cmd' : 'dsh')
-    if (existsSync(storageBin)) {
-      return {
-        command: storageBin,
-        args: profileArgs,
+    for (const binName of candidateBinNames) {
+      const storageBin = join(storageRoot, 'node_modules', '.bin', binName)
+      if (existsSync(storageBin)) {
+        return {
+          command: storageBin,
+          args: profileArgs,
+        }
       }
     }
   }
 
-  // 3. Check global dsh binary in nodeBin directory
+  // 3. Check global binary in nodeBin directory
   if (nodeBin !== 'node') {
-    const isWin = process.platform === 'win32'
-    const directCandidate = join(dirname(nodeBin), isWin ? 'dsh.cmd' : 'dsh')
-    if (existsSync(directCandidate)) {
-      return {
-        command: directCandidate,
-        args: profileArgs,
+    for (const binName of candidateBinNames) {
+      const directCandidate = join(dirname(nodeBin), binName)
+      if (existsSync(directCandidate)) {
+        return {
+          command: directCandidate,
+          args: profileArgs,
+        }
       }
     }
   }
 
-  // 4. Fallback to global `dsh` CLI command
+  // 4. Fallback to global `ewh` or `dsh` CLI command
   return {
-    command: process.platform === 'win32' ? 'dsh.cmd' : 'dsh',
+    command: isWin ? 'ewh.cmd' : 'ewh',
     args: profileArgs,
   }
 }
 
 /**
- * Resolves the source CLI command for a selected DeepSeek Harness checkout.
+ * Resolves the source CLI command for a selected EveryWhere Harness checkout.
  */
 export function resolveWorkspaceSourceCommand(
   projectPath: string,
@@ -442,7 +460,7 @@ export function resolveWorkspaceSourceCommand(
 ): { command: string; args: string[] } {
   const sourceBin = join(projectPath, 'apps', 'cli', 'src', 'bin.ts')
   if (!existsSync(sourceBin)) {
-    throw new Error(`The selected folder is not a DeepSeek Harness source checkout: ${sourceBin}`)
+    throw new Error(`The selected folder is not an EveryWhere Harness source checkout: ${sourceBin}`)
   }
 
   const args = ['--import', 'tsx/esm', sourceBin, '--profile', config.profile || 'web', '--no-open']
@@ -453,7 +471,7 @@ export function resolveWorkspaceSourceCommand(
 }
 
 /**
- * Checks if an installed DeepSeek Harness command is available on this system.
+ * Checks if an installed EveryWhere Harness command is available on this system.
  */
 export async function checkDshAvailable(
   config: ExtensionConfig,
@@ -464,29 +482,38 @@ export async function checkDshAvailable(
     return true
   }
 
+  const isWin = process.platform === 'win32'
+  const candidateBinNames = isWin ? ['ewh.cmd', 'dsh.cmd'] : ['ewh', 'dsh']
+
   // 2. Check private storage installation
   if (storageRoot) {
-    const isWin = process.platform === 'win32'
-    const storageBin = join(storageRoot, 'node_modules', '.bin', isWin ? 'dsh.cmd' : 'dsh')
-    if (existsSync(storageBin)) return true
+    for (const binName of candidateBinNames) {
+      const storageBin = join(storageRoot, 'node_modules', '.bin', binName)
+      if (existsSync(storageBin)) return true
+    }
   }
 
   // 3. Check direct candidate in node bin directory
   const nodeBin = findNodeBinary()
   if (nodeBin !== 'node') {
-    const isWin = process.platform === 'win32'
-    const directCandidate = join(dirname(nodeBin), isWin ? 'dsh.cmd' : 'dsh')
-    if (existsSync(directCandidate)) return true
+    for (const binName of candidateBinNames) {
+      const directCandidate = join(dirname(nodeBin), binName)
+      if (existsSync(directCandidate)) return true
+    }
   }
 
-  // 4. Check system PATH via `dsh --version`
-  return new Promise<boolean>((res) => {
-    const env = resolveEnhancedEnv(config)
-    const cmd = process.platform === 'win32' ? 'dsh.cmd' : 'dsh'
-    const child = spawnExecutable(cmd, ['--version'], { env, stdio: 'ignore' })
-    child.on('error', () => res(false))
-    child.on('close', code => res(code === 0))
-  })
+  // 4. Check system PATH via `ewh --version` or `dsh --version`
+  const env = resolveEnhancedEnv(config)
+  for (const cmd of candidateBinNames) {
+    const ok = await new Promise<boolean>((res) => {
+      const child = spawnExecutable(cmd, ['--version'], { env, stdio: 'ignore' })
+      child.on('error', () => res(false))
+      child.on('close', code => res(code === 0))
+    })
+    if (ok) return true
+  }
+
+  return false
 }
 
 /**
@@ -646,7 +673,7 @@ function createIframeProxy(
 }
 
 /**
- * Manages the lifecycle of the DeepSeek Harness runtime process and Webview proxy.
+ * Manages the lifecycle of the EveryWhere Harness runtime process and Webview proxy.
  */
 export class DshProcessManager {
   private childProcess: ChildProcess | null = null
@@ -673,7 +700,7 @@ export class DshProcessManager {
       return
     }
 
-    // Check if an existing DeepSeek Harness service is already running on the system
+    // Check if an existing EveryWhere Harness service is already running on the system
     const existing = await this.findRunningDsh(this.config.port)
     if (existing) {
       try {
@@ -715,7 +742,7 @@ export class DshProcessManager {
   }
 
   /**
-   * Probes for an already running DeepSeek Harness backend on configured or standard ports.
+   * Probes for an already running EveryWhere Harness backend on configured or standard ports.
    */
   public async findRunningDsh(targetPort?: number): Promise<{ port: number; pid?: number } | undefined> {
     const candidatePorts = [targetPort ?? this.config.port, 3080, 3000].filter(
@@ -734,7 +761,7 @@ export class DshProcessManager {
   }
 
   /**
-   * Attaches the VS Code Webview proxy to an already running DeepSeek Harness instance.
+   * Attaches the VS Code Webview proxy to an already running EveryWhere Harness instance.
    */
   public async attachToRunningService(service: { port: number; pid?: number }): Promise<string> {
     const dshPort = service.port
@@ -782,38 +809,38 @@ export class DshProcessManager {
       const webviewUrl = `http://127.0.0.1:${proxyPort}/`
       this.backendPort = dshPort
       this.setStatus('running', { url: webviewUrl, port: dshPort, pid: service.pid })
-      this.outputChannel.appendLine(`[DeepSeek Harness] Backend ready at: ${rawDshUrl}`)
-      this.outputChannel.appendLine(`[DeepSeek Harness] Webview sidebar ready at: ${webviewUrl}`)
+      this.outputChannel.appendLine(`[EveryWhere Harness] Backend ready at: ${rawDshUrl}`)
+      this.outputChannel.appendLine(`[EveryWhere Harness] Webview sidebar ready at: ${webviewUrl}`)
       return webviewUrl
     } catch (proxyErr: unknown) {
       const msg = proxyErr instanceof Error ? proxyErr.message : String(proxyErr)
-      this.outputChannel.appendLine(`[DeepSeek Harness] Proxy start failed: ${msg}. Using raw URL.`)
+      this.outputChannel.appendLine(`[EveryWhere Harness] Proxy start failed: ${msg}. Using raw URL.`)
       this.backendPort = dshPort
       this.setStatus('running', { url: rawDshUrl, port: dshPort, pid: service.pid })
-      this.outputChannel.appendLine(`[DeepSeek Harness] Backend ready at: ${rawDshUrl}`)
+      this.outputChannel.appendLine(`[EveryWhere Harness] Backend ready at: ${rawDshUrl}`)
       return rawDshUrl
     }
   }
 
   /**
-   * Automatically installs DeepSeek Harness using npm.
+   * Automatically installs EveryWhere Harness using npm.
    * Tries global install first, falls back to isolated extension storage prefix if permissions fail.
    */
   public async installHarness(): Promise<void> {
     this.setStatus('installing')
     this.outputChannel.show(true)
     this.outputChannel.appendLine('=========================================')
-    this.outputChannel.appendLine('[DeepSeek Harness] Starting automated installation...')
+    this.outputChannel.appendLine('[EveryWhere Harness] Starting automated installation...')
     this.outputChannel.appendLine('=========================================')
 
     const npmBin = findNpmBinary()
     const env = resolveEnhancedEnv(this.config)
 
     // Step 1: Try global installation
-    const tryGlobal = (): Promise<boolean> => {
+    const runInstall = (args: string[], desc: string): Promise<boolean> => {
       return new Promise<boolean>((res) => {
-        this.outputChannel.appendLine(`[DeepSeek Harness] Executing: ${npmBin} install -g @deepseek-ai/dsh`)
-        const child = spawnExecutable(npmBin, ['install', '-g', '@deepseek-ai/dsh'], {
+        this.outputChannel.appendLine(`[EveryWhere Harness] Executing: ${npmBin} ${args.join(' ')}`)
+        const child = spawnExecutable(npmBin, args, {
           env,
           stdio: ['ignore', 'pipe', 'pipe'],
         })
@@ -823,58 +850,48 @@ export class DshProcessManager {
 
         child.on('close', (code) => {
           if (code === 0) {
-            this.outputChannel.appendLine('[DeepSeek Harness] Global installation succeeded!')
+            this.outputChannel.appendLine(`[EveryWhere Harness] ${desc} succeeded!`)
             res(true)
           } else {
-            this.outputChannel.appendLine(`[DeepSeek Harness] Global install exited with code ${code}. Trying local storage fallback...`)
+            this.outputChannel.appendLine(`[EveryWhere Harness] ${desc} exited with code ${code}.`)
             res(false)
           }
         })
         child.on('error', () => res(false))
       })
+    }
+
+    // Step 1: Try global installation of @everywhere-harness/ewh, then legacy fallbacks
+    let success = await runInstall(['install', '-g', '@everywhere-harness/ewh'], 'Global install (@everywhere-harness/ewh)')
+    if (!success) {
+      success = await runInstall(['install', '-g', 'everywhere-harness'], 'Global install (everywhere-harness)')
+    }
+    if (!success) {
+      success = await runInstall(['install', '-g', '@deepseek-ai/dsh'], 'Global install (@deepseek-ai/dsh)')
     }
 
     // Step 2: Try local extension storage fallback
-    const tryLocal = (storagePath: string): Promise<boolean> => {
-      return new Promise<boolean>((res) => {
-        try {
-          if (!existsSync(storagePath)) {
-            mkdirSync(storagePath, { recursive: true })
-          }
-        } catch {}
-
-        this.outputChannel.appendLine(`[DeepSeek Harness] Executing: ${npmBin} install @deepseek-ai/dsh --prefix ${storagePath}`)
-        const child = spawnExecutable(npmBin, ['install', '@deepseek-ai/dsh', '--prefix', storagePath], {
-          env,
-          stdio: ['ignore', 'pipe', 'pipe'],
-        })
-
-        child.stdout?.on('data', d => this.outputChannel.append(d.toString()))
-        child.stderr?.on('data', d => this.outputChannel.append(d.toString()))
-
-        child.on('close', (code) => {
-          if (code === 0) {
-            this.outputChannel.appendLine('[DeepSeek Harness] Local extension storage installation succeeded!')
-            res(true)
-          } else {
-            this.outputChannel.appendLine(`[DeepSeek Harness] Local install failed with code ${code}.`)
-            res(false)
-          }
-        })
-        child.on('error', () => res(false))
-      })
-    }
-
-    let success = await tryGlobal()
     if (!success && this.storageRoot) {
-      success = await tryLocal(this.storageRoot)
+      try {
+        if (!existsSync(this.storageRoot)) {
+          mkdirSync(this.storageRoot, { recursive: true })
+        }
+      } catch {}
+
+      success = await runInstall(['install', '@everywhere-harness/ewh', '--prefix', this.storageRoot], 'Local storage install (@everywhere-harness/ewh)')
+      if (!success) {
+        success = await runInstall(['install', 'everywhere-harness', '--prefix', this.storageRoot], 'Local storage install (everywhere-harness)')
+      }
+      if (!success) {
+        success = await runInstall(['install', '@deepseek-ai/dsh', '--prefix', this.storageRoot], 'Local storage install (@deepseek-ai/dsh)')
+      }
     }
 
     if (success) {
       this.setStatus('stopped')
-      vscode.window.showInformationMessage('DeepSeek Harness (@deepseek-ai/dsh) installed successfully!')
+      vscode.window.showInformationMessage('EveryWhere Harness installed successfully!')
     } else {
-      const errMsg = 'Failed to install @deepseek-ai/dsh. Please run "npm install -g @deepseek-ai/dsh" manually in terminal.'
+      const errMsg = 'Failed to install EveryWhere Harness. Please run "npm install -g @everywhere-harness/ewh" manually in terminal.'
       this.setStatus('not_installed', { error: errMsg })
       vscode.window.showErrorMessage(errMsg, 'View Logs').then((action) => {
         if (action === 'View Logs') {
@@ -885,7 +902,7 @@ export class DshProcessManager {
   }
 
   /**
-   * Start the DeepSeek Harness runtime and proxy.
+   * Start the EveryWhere Harness runtime and proxy.
    * Resolves when the authenticated web URL is ready to be embedded.
    */
   public async start(): Promise<string> {
@@ -896,14 +913,14 @@ export class DshProcessManager {
     const available = await this.isAvailable()
     if (!available) {
       this.setStatus('not_installed')
-      throw new Error('DeepSeek Harness is not installed. Please click "Instalar DeepSeek Harness" in the sidebar.')
+      throw new Error('EveryWhere Harness is not installed. Please click "Instalar EveryWhere Harness" in the sidebar.')
     }
 
-    // Check if an existing DeepSeek Harness service is already running
+    // Check if an existing EveryWhere Harness service is already running
     const existing = await this.findRunningDsh(this.config.port)
     if (existing) {
       this.outputChannel.appendLine(
-        `[DeepSeek Harness] Existing service detected on port ${existing.port}. Connecting to open instance...`,
+        `[EveryWhere Harness] Existing service detected on port ${existing.port}. Connecting to open instance...`,
       )
       return this.attachToRunningService(existing)
     }
@@ -942,7 +959,7 @@ export class DshProcessManager {
             resolve(info.url)
           } else if (info.status === 'error' || info.status === 'not_installed') {
             disposable.dispose()
-            reject(new Error(info.error ?? 'Failed to start DeepSeek Harness'))
+            reject(new Error(info.error ?? 'Failed to start EveryWhere Harness'))
           }
         })
       })
@@ -953,9 +970,9 @@ export class DshProcessManager {
     const env = resolveEnhancedEnv(this.config)
 
     this.outputChannel.appendLine('=========================================')
-    this.outputChannel.appendLine('[DeepSeek Harness] Starting process...')
-    this.outputChannel.appendLine(`[DeepSeek Harness] Command: ${command} ${args.join(' ')}`)
-    this.outputChannel.appendLine(`[DeepSeek Harness] Working directory: ${cwd}`)
+    this.outputChannel.appendLine('[EveryWhere Harness] Starting process...')
+    this.outputChannel.appendLine(`[EveryWhere Harness] Command: ${command} ${args.join(' ')}`)
+    this.outputChannel.appendLine(`[EveryWhere Harness] Working directory: ${cwd}`)
     this.outputChannel.appendLine('=========================================')
 
     return new Promise<string>((resolve, reject) => {
@@ -965,8 +982,8 @@ export class DshProcessManager {
       const startupTimer = setTimeout(() => {
         if (!isSettled) {
           isSettled = true
-          const errMsg = 'Timeout waiting for DeepSeek Harness to start. Check output logs for details.'
-          this.outputChannel.appendLine(`[DeepSeek Harness] ERROR: ${errMsg}`)
+          const errMsg = 'Timeout waiting for EveryWhere Harness to start. Check output logs for details.'
+          this.outputChannel.appendLine(`[EveryWhere Harness] ERROR: ${errMsg}`)
           this.setStatus('error', { error: errMsg })
           reject(new Error(errMsg))
         }
@@ -982,7 +999,7 @@ export class DshProcessManager {
         this.childProcess = child
         this.setStatus('starting', { pid: child.pid })
 
-        const urlRegex = /dsh web:\s+(https?:\/\/[^\s\)]+)/i
+        const urlRegex = /(?:ewh|dsh)\s+web:\s+(https?:\/\/[^\s\)]+)/i
 
         const handleData = async (data: Buffer) => {
           const text = data.toString('utf-8')
@@ -1017,7 +1034,7 @@ export class DshProcessManager {
                 }
               } catch (authFetchErr) {
                 this.outputChannel.appendLine(
-                  `[DeepSeek Harness] Warning during initial auth fetch: ${authFetchErr}`,
+                  `[EveryWhere Harness] Warning during initial auth fetch: ${authFetchErr}`,
                 )
               }
 
@@ -1029,16 +1046,16 @@ export class DshProcessManager {
               this.backendPort = dshPort
               this.setStatus('running', { url: webviewUrl, port: dshPort, pid: child.pid })
               saveLastSession(this.storageRoot, { rawUrl: rawDshUrl, port: dshPort, token })
-              this.outputChannel.appendLine(`[DeepSeek Harness] Backend ready at: ${rawDshUrl}`)
-              this.outputChannel.appendLine(`[DeepSeek Harness] Webview sidebar ready at: ${webviewUrl}`)
+              this.outputChannel.appendLine(`[EveryWhere Harness] Backend ready at: ${rawDshUrl}`)
+              this.outputChannel.appendLine(`[EveryWhere Harness] Webview sidebar ready at: ${webviewUrl}`)
               resolve(webviewUrl)
             } catch (proxyErr: unknown) {
               const msg = proxyErr instanceof Error ? proxyErr.message : String(proxyErr)
-              this.outputChannel.appendLine(`[DeepSeek Harness] Proxy start failed: ${msg}. Using raw URL.`)
+              this.outputChannel.appendLine(`[EveryWhere Harness] Proxy start failed: ${msg}. Using raw URL.`)
               this.backendPort = dshPort
               this.setStatus('running', { url: rawDshUrl, port: dshPort, pid: child.pid })
               saveLastSession(this.storageRoot, { rawUrl: rawDshUrl, port: dshPort, token })
-              this.outputChannel.appendLine(`[DeepSeek Harness] Backend ready at: ${rawDshUrl}`)
+              this.outputChannel.appendLine(`[EveryWhere Harness] Backend ready at: ${rawDshUrl}`)
               resolve(rawDshUrl)
             }
           }
@@ -1048,7 +1065,7 @@ export class DshProcessManager {
         child.stderr?.on('data', handleData)
 
         child.on('error', (err: Error) => {
-          this.outputChannel.appendLine(`[DeepSeek Harness] Process spawn error: ${err.message}`)
+          this.outputChannel.appendLine(`[EveryWhere Harness] Process spawn error: ${err.message}`)
           if (!isSettled) {
             isSettled = true
             clearTimeout(startupTimer)
@@ -1060,7 +1077,7 @@ export class DshProcessManager {
         child.on('close', async (code: number | null, signal: string | null) => {
           clearTimeout(startupTimer)
           this.outputChannel.appendLine(
-            `[DeepSeek Harness] Process exited (code: ${code}, signal: ${signal})`,
+            `[EveryWhere Harness] Process exited (code: ${code}, signal: ${signal})`,
           )
           this.childProcess = null
           this.closeProxy()
@@ -1070,12 +1087,12 @@ export class DshProcessManager {
           } else if (!isSettled) {
             isSettled = true
 
-            // When failing with exit code 1, check if DeepSeek Harness is already running
+            // When failing with exit code 1, check if EveryWhere Harness is already running
             if (code === 1) {
               const running = await this.findRunningDsh(this.config.port)
               if (running) {
                 this.outputChannel.appendLine(
-                  `[DeepSeek Harness] Process exited with code 1 because DeepSeek Harness is already running on port ${running.port}. Connecting to existing instance...`,
+                  `[EveryWhere Harness] Process exited with code 1 because EveryWhere Harness is already running on port ${running.port}. Connecting to existing instance...`,
                 )
                 try {
                   const attachedUrl = await this.attachToRunningService(running)
@@ -1083,14 +1100,14 @@ export class DshProcessManager {
                   return
                 } catch (attachErr: unknown) {
                   this.outputChannel.appendLine(
-                    `[DeepSeek Harness] Failed to attach to running service: ${attachErr}`,
+                    `[EveryWhere Harness] Failed to attach to running service: ${attachErr}`,
                   )
                 }
               }
 
               if (!isRetry) {
                 this.outputChannel.appendLine(
-                  '[DeepSeek Harness] Process exited with code 1 on initial connect. Stopping existing service/processes and restarting chat...',
+                  '[EveryWhere Harness] Process exited with code 1 on initial connect. Stopping existing service/processes and restarting chat...',
                 )
                 try {
                   await this.stop()
@@ -1101,7 +1118,7 @@ export class DshProcessManager {
                 } catch (retryErr: unknown) {
                   const retryMsg = retryErr instanceof Error ? retryErr.message : String(retryErr)
                   this.outputChannel.appendLine(
-                    `[DeepSeek Harness] Automatic restart after stop failed: ${retryMsg}`,
+                    `[EveryWhere Harness] Automatic restart after stop failed: ${retryMsg}`,
                   )
                   this.setStatus('error', { error: retryMsg, url: undefined, port: undefined, pid: undefined })
                   reject(new Error(retryMsg))
@@ -1110,7 +1127,7 @@ export class DshProcessManager {
               }
             }
 
-            const errMsg = `DeepSeek Harness exited with code ${code}`
+            const errMsg = `EveryWhere Harness exited with code ${code}`
             this.setStatus('error', { error: errMsg, url: undefined, port: undefined, pid: undefined })
             reject(new Error(errMsg))
           } else {
@@ -1120,7 +1137,7 @@ export class DshProcessManager {
       } catch (err: unknown) {
         clearTimeout(startupTimer)
         const error = err instanceof Error ? err : new Error(String(err))
-        this.outputChannel.appendLine(`[DeepSeek Harness] Spawn exception: ${error.message}`)
+        this.outputChannel.appendLine(`[EveryWhere Harness] Spawn exception: ${error.message}`)
         this.setStatus('error', { error: error.message })
         if (!isSettled) {
           isSettled = true
@@ -1142,7 +1159,7 @@ export class DshProcessManager {
   }
 
   /**
-   * Stop the running DeepSeek Harness instance and proxy.
+   * Stop the running EveryWhere Harness instance and proxy.
    */
   public async stop(): Promise<void> {
     this.closeProxy()
@@ -1159,14 +1176,14 @@ export class DshProcessManager {
     }
 
     this.isStopping = true
-    this.outputChannel.appendLine('[DeepSeek Harness] Stopping process...')
+    this.outputChannel.appendLine('[EveryWhere Harness] Stopping process...')
 
     const child = this.childProcess
     await new Promise<void>((resolve) => {
       let resolved = false
       const timeout = setTimeout(() => {
         if (!resolved && this.childProcess) {
-          this.outputChannel.appendLine('[DeepSeek Harness] Forcing kill (SIGKILL)...')
+          this.outputChannel.appendLine('[EveryWhere Harness] Forcing kill (SIGKILL)...')
           try {
             child.kill('SIGKILL')
           } catch {

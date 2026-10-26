@@ -37,7 +37,7 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
         alignmentX = Component.CENTER_ALIGNMENT
     }
 
-    private val overlaySubtitle = JBLabel("DeepSeek Harness Autonomous AI Agent", SwingConstants.CENTER).apply {
+    private val overlaySubtitle = JBLabel("EveryWhere Harness Autonomous AI Agent", SwingConstants.CENTER).apply {
         font = font.deriveFont(Font.PLAIN, 12f)
         foreground = JBColor.GRAY
         alignmentX = Component.CENTER_ALIGNMENT
@@ -56,7 +56,7 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
         alignmentX = Component.CENTER_ALIGNMENT
     }
 
-    private val overlayStartBtn = JButton("▶ Iniciar DeepSeek Harness").apply {
+    private val overlayStartBtn = JButton("▶ Iniciar EveryWhere Harness").apply {
         font = font.deriveFont(Font.BOLD, 13f)
         cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         alignmentX = Component.CENTER_ALIGNMENT
@@ -164,7 +164,7 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
                 add(Box.createVerticalStrut(16))
 
                 val tip = JBLabel(
-                    "<html><center style='color:#777; font-size:10px;'>O agente DeepSeek Harness interage diretamente com o código e arquivos do seu projeto aberto no IntelliJ.</center></html>",
+                    "<html><center style='color:#777; font-size:10px;'>O agente EveryWhere Harness interage diretamente com o código e arquivos do seu projeto aberto no IntelliJ.</center></html>",
                     SwingConstants.CENTER
                 ).apply {
                     alignmentX = Component.CENTER_ALIGNMENT
@@ -209,7 +209,7 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
                     statusLabel.text = "Iniciando..."
                     statusLabel.foreground = JBColor(Color(230, 81, 0), Color(220, 180, 80))
 
-                    overlayStatusText.text = "Iniciando DeepSeek Harness runtime..."
+                    overlayStatusText.text = "Iniciando EveryWhere Harness runtime..."
                     overlayStatusText.foreground = JBColor(Color(230, 81, 0), Color(220, 180, 80))
                     overlayStatusText.isVisible = true
                     overlayStartBtn.isEnabled = false
@@ -231,7 +231,7 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
 
                     overlayStatusText.isVisible = false
                     overlayStartBtn.isEnabled = true
-                    overlayStartBtn.text = "▶ Iniciar DeepSeek Harness"
+                    overlayStartBtn.text = "▶ Iniciar EveryWhere Harness"
                     cardLayout.show(contentCardPanel, CARD_OVERLAY)
                 }
             }

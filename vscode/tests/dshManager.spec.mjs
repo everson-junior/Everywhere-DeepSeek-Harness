@@ -1,8 +1,15 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert'
 
-describe('DeepSeek Harness VS Code Extension - Runtime URL Parsing', () => {
-  const urlRegex = /dsh web:\s+(https?:\/\/[^\s\)]+)/i
+describe('EveryWhere Harness VS Code Extension - Runtime URL Parsing', () => {
+  const urlRegex = /(?:ewh|dsh)\s+web:\s+(https?:\/\/[^\s\)]+)/i
+
+  it('matches standard authenticated EWH URL without LAN info', () => {
+    const logLine = 'ewh web: http://127.0.0.1:4567/?token=test-token-xyz'
+    const match = logLine.match(urlRegex)
+    assert.ok(match)
+    assert.strictEqual(match[1], 'http://127.0.0.1:4567/?token=test-token-xyz')
+  })
 
   it('matches standard authenticated DSH URL without LAN info', () => {
     const logLine = 'dsh web: http://127.0.0.1:4567/?token=test-token-xyz'
@@ -11,8 +18,8 @@ describe('DeepSeek Harness VS Code Extension - Runtime URL Parsing', () => {
     assert.strictEqual(match[1], 'http://127.0.0.1:4567/?token=test-token-xyz')
   })
 
-  it('matches standard authenticated DSH URL with LAN info and extracts main loopback URL', () => {
-    const logLine = 'dsh web: http://127.0.0.1:4567/?token=test-token-xyz (LAN: http://192.168.1.5:4567/?token=test-token-xyz)'
+  it('matches standard authenticated EWH URL with LAN info and extracts main loopback URL', () => {
+    const logLine = 'ewh web: http://127.0.0.1:4567/?token=test-token-xyz (LAN: http://192.168.1.5:4567/?token=test-token-xyz)'
     const match = logLine.match(urlRegex)
     assert.ok(match)
     assert.strictEqual(match[1], 'http://127.0.0.1:4567/?token=test-token-xyz')
@@ -32,10 +39,10 @@ describe('DeepSeek Harness VS Code Extension - Runtime URL Parsing', () => {
   })
 })
 
-describe('DeepSeek Harness VS Code Extension - Command Resolution', () => {
+describe('EveryWhere Harness VS Code Extension - Command Resolution', () => {
   it('formats npm install command properly', () => {
-    const npmCmd = 'npm install -g @deepseek-ai/dsh'
-    assert.strictEqual(npmCmd, 'npm install -g @deepseek-ai/dsh')
+    const npmCmd = 'npm install -g @everywhere-harness/ewh'
+    assert.strictEqual(npmCmd, 'npm install -g @everywhere-harness/ewh')
   })
 
   it('preserves quoted Windows executable paths when parsing configuration', () => {
@@ -48,21 +55,21 @@ describe('DeepSeek Harness VS Code Extension - Command Resolution', () => {
   })
 
   it('converts Windows loader paths to file URLs for Node ESM', () => {
-    const loaderPath = 'C:\\engenharia\\deepseek-harness\\node_modules\\tsx\\dist\\esm\\index.mjs'
+    const loaderPath = 'C:\\engenharia\\everywhere-harness\\node_modules\\tsx\\dist\\esm\\index.mjs'
     assert.strictEqual(
       new URL(`file://${loaderPath.replaceAll('\\\\', '/')}`).href,
-      'file:///C:/engenharia/deepseek-harness/node_modules/tsx/dist/esm/index.mjs',
+      'file:///C:/engenharia/everywhere-harness/node_modules/tsx/dist/esm/index.mjs',
     )
   })
 
   it('does not treat a workspace source checkout as an installed dsh command', () => {
-    const sourceCheckout = 'C:\\engenharia\\deepseek-harness\\apps\\cli\\src\\bin.ts'
+    const sourceCheckout = 'C:\\engenharia\\everywhere-harness\\apps\\cli\\src\\bin.ts'
     const installedCommands = []
     assert.strictEqual(installedCommands.includes(sourceCheckout), false)
   })
 })
 
-describe('DeepSeek Harness VS Code Extension - Session and Auth Helpers', () => {
+describe('EveryWhere Harness VS Code Extension - Session and Auth Helpers', () => {
   it('generates valid RFC-compliant base64url cookie structure with HMAC signature', async () => {
     const crypto = await import('node:crypto')
     const secret = crypto.randomBytes(32)

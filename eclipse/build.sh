@@ -17,7 +17,7 @@ for arg in "$@"; do
 done
 
 echo "=========================================================="
-echo " Building Everywhere DeepSeek Harness for Eclipse IDE     "
+echo " Building EveryWhere Harness for Eclipse IDE              "
 echo " Target Version: $VERSION                                "
 echo "=========================================================="
 

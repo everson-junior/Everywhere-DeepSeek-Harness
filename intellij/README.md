@@ -1,6 +1,6 @@
 <div align="center">
 
-# Everywhere DeepSeek Harness for IntelliJ IDEA 🌐⚡
+# EveryWhere Harness for IntelliJ IDEA 🌐⚡
 
 [English](#-english) • [Português](#-português)
 
@@ -8,7 +8,7 @@
 [![Java Runtime](https://img.shields.io/badge/Java-17-orange?logo=openjdk)](https://openjdk.org/)
 [![Embedded Browser](https://img.shields.io/badge/Webview-JCEF%20(Chromium)-teal)]()
 [![JetBrains Marketplace](https://img.shields.io/badge/JetBrains%20Marketplace-Plugin%2035191-orange?logo=jetbrains)](https://plugins.jetbrains.com/plugin/35191)
-[![DeepSeek](https://img.shields.io/badge/AI-DeepSeek--V3%20%7C%20DeepSeek--R1-007acc)](https://deepseek.com)
+[![EveryWhere](https://img.shields.io/badge/AI-EveryWhere-007acc)](https://deepseek.com)
 
 </div>
 
@@ -16,18 +16,18 @@
 
 ## 🇺🇸 English
 
-**Everywhere DeepSeek Harness** is the official plugin developed specifically for the JetBrains ecosystem, with validated native support for **IntelliJ IDEA 2024.1+ (Community Edition and Ultimate)** and subsequent versions.
+**EveryWhere Harness** is the plugin developed specifically for the JetBrains ecosystem, with validated native support for **IntelliJ IDEA 2024.1+ (Community Edition and Ultimate)** and subsequent versions.
 
-It embeds the official **DeepSeek Harness (`dsh`)** runtime inside a native **Tool Window** using hardware-accelerated **JCEF (Java Chromium Embedded Framework)**, offering a seamless and integrated experience directly inside your Java, Kotlin, Spring, Android, and Web development workflow.
+It embeds the **EveryWhere Harness (`ewh` / `dsh`)** runtime inside a native **Tool Window** using hardware-accelerated **JCEF (Java Chromium Embedded Framework)**, offering a seamless and integrated experience directly inside your Java, Kotlin, Spring, Android, and Web development workflow.
 
 ### 🌟 Features
 
 - 🪟 **Native Tool Window with JCEF**: Smooth, modern hardware-accelerated Chromium webview embedded directly into the right-hand tool window strip of IntelliJ.
 - 📂 **Workspace Project Binding**: Contextually bound to the root directory of the currently open IntelliJ IDEA project (`project.basePath`).
 - 🔄 **Intelligent Auto-Recovery (Exit Code 1)**: If old processes or ports (3080/3000) are busy, the plugin automatically detects failure, terminates orphaned processes (`taskkill` / `fuser` / `pkill`), and restores the service in seconds.
-- ⚙️ **Integrated Settings Page**: Full configuration under `Settings -> Tools -> Everywhere DeepSeek Harness` (API keys, ports, profiles, auto-start, and binary path).
+- ⚙️ **Integrated Settings Page**: Full configuration under `Settings -> Tools -> EveryWhere Harness` (API keys, ports, profiles, auto-start, and binary path).
 - 🧭 **Quick Action Toolbar**:
-  - ▶ **Start**: Boots the official `dsh` runtime.
+  - ▶ **Start**: Boots the `ewh` / `dsh` runtime.
   - 🛑 **Stop**: Halts the process and releases network ports.
   - 🔄 **Restart**: Quick session restart.
   - 🔁 **Reload**: Refreshes the embedded webview page.
@@ -39,9 +39,9 @@ It embeds the official **DeepSeek Harness (`dsh`)** runtime inside a native **To
 
 #### Prerequisites
 1. **IntelliJ IDEA 2024.1+** (Community or Ultimate) or **JDK 17+** installed.
-2. **DeepSeek Harness CLI**:
+2. **EveryWhere Harness CLI**:
    ```cmd
-   npm install -g @deepseek-ai/dsh
+   npm install -g @everywhere-harness/ewh
    ```
 
 #### Option 1: Build via Command Line (Gradle)
@@ -81,7 +81,7 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 1. Directly via Marketplace: Open [Everywhere on JetBrains Marketplace (Plugin #35191)](https://plugins.jetbrains.com/plugin/35191) and click **Install to IntelliJ IDEA**.
 2. Or inside IntelliJ IDEA:
    - Go to `Settings` (`Ctrl + Alt + S` / `Cmd + ,`) ➔ **Plugins**.
-   - In the **Marketplace** tab, search for `Everywhere DeepSeek Harness`.
+   - In the **Marketplace** tab, search for `EveryWhere Harness`.
    - Click **Install** and restart if prompted.
 
 #### Method 2: Install from Disk (ZIP)
@@ -97,8 +97,8 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 
 ### 🎯 How to Use
 
-1. After installation, locate the **Everywhere** tab on the right sidebar of the editor (or go to `Tools` ➔ `Everywhere (DeepSeek Harness)` ➔ `Start DeepSeek Harness`).
-2. If **Auto-Start** is enabled, the DeepSeek Harness boots automatically when the tool window is first opened.
+1. After installation, locate the **Everywhere** tab on the right sidebar of the editor (or go to `Tools` ➔ `EveryWhere Harness` ➔ `Iniciar EveryWhere Harness`).
+2. If **Auto-Start** is enabled, the EveryWhere Harness boots automatically when the tool window is first opened.
 3. The agent has instant access to your project workspace files and terminal tools.
 
 ### ⚙️ Settings (Settings ➔ Tools ➔ Everywhere)
@@ -107,27 +107,27 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 |---|---|---|
 | **Auto Start** | `true` | Automatically starts the agent when opening the Tool Window |
 | **Port** | `0` | Web server port (0 assigns an available port automatically) |
-| **Profile** | `"web"` | DeepSeek Harness execution profile (`web`, `headless`, `tui`) |
-| **DeepSeek API Key** | `""` | DeepSeek API key (also accepted via `DEEPSEEK_API_KEY` environment variable) |
-| **Base URL** | `https://api.deepseek.com` | DeepSeek API base endpoint URL |
-| **Custom DSH Path** | `""` | Custom path to the `dsh` executable if not in system PATH |
+| **Profile** | `"web"` | EveryWhere Harness execution profile (`web`, `headless`, `tui`) |
+| **EveryWhere API Key** | `""` | EveryWhere API key (also accepted via `EVERYWHERE_API_KEY` / `DEEPSEEK_API_KEY` environment variable) |
+| **Base URL** | `https://api.deepseek.com` | EveryWhere API base endpoint URL |
+| **Custom DSH Path** | `""` | Custom path to the `ewh` / `dsh` executable if not in system PATH |
 
 ---
 
 ## 🇧🇷 Português
 
-Esta é a extensão oficial do **Everywhere** desenvolvida especificamente para o ecossistema JetBrains, com suporte nativo e validado para **IntelliJ IDEA 2024.1.2 (Community Edition / Ultimate, Build #IC-241.17011.79)** e versões posteriores.
+Esta é a extensão do **EveryWhere** desenvolvida especificamente para o ecossistema JetBrains, com suporte nativo e validado para **IntelliJ IDEA 2024.1.2 (Community Edition / Ultimate, Build #IC-241.17011.79)** e versões posteriores.
 
-Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma janela de ferramentas nativa (**Tool Window**) utilizando **JCEF (Java Chromium Embedded Framework)** acelerado por hardware, oferecendo uma experiência interativa e integrada diretamente ao seu fluxo de desenvolvimento em Java, Kotlin, Spring, Android e projetos Web.
+Ela incorpora o runtime do **EveryWhere Harness (`ewh` / `dsh`)** em uma janela de ferramentas nativa (**Tool Window**) utilizando **JCEF (Java Chromium Embedded Framework)** acelerado por hardware, oferecendo uma experiência interativa e integrada diretamente ao seu fluxo de desenvolvimento em Java, Kotlin, Spring, Android e projetos Web.
 
 ### 🌟 Funcionalidades
 
 - 🪟 **Tool Window Nativa com JCEF**: Renderização fluida e moderna com Chromium embutido na barra lateral direita do IntelliJ.
 - 📂 **Workspace Project Binding**: Conectado contextualmente à pasta raiz do projeto aberto no IntelliJ IDEA (`project.basePath`).
 - 🔄 **Auto-Recuperação Inteligente (Exit Code 1)**: Se houver processos antigos ou portas travadas (3080/3000), o plugin detecta a falha, encerra automaticamente os processos órfãos (`taskkill` / `fuser` / `pkill`) e retoma o serviço em segundos.
-- ⚙️ **Página de Configurações Integrada**: Configurações em `Settings -> Tools -> Everywhere DeepSeek Harness` (chaves de API, portas, perfis, auto-start e caminho do executável).
+- ⚙️ **Página de Configurações Integrada**: Configurações em `Settings -> Tools -> EveryWhere Harness` (chaves de API, portas, perfis, auto-start e caminho do executável).
 - 🧭 **Barra de Ações Rápida (Toolbar)**:
-  - ▶ **Iniciar**: Inicia o runtime oficial `dsh`.
+  - ▶ **Iniciar**: Inicia o runtime `ewh` / `dsh`.
   - 🛑 **Parar**: Interrompe o processo e desocupa portas.
   - 🔄 **Reiniciar**: Reinicia a sessão rapidamente.
   - 🔁 **Recarregar**: Atualiza a página do webview.
@@ -139,9 +139,9 @@ Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma janela de
 
 #### Pré-requisitos
 1. **IntelliJ IDEA 2024.1.2** (Community Edition ou Ultimate) ou **JDK 17** instalado.
-2. **DeepSeek Harness CLI**:
+2. **EveryWhere Harness CLI**:
    ```cmd
-   npm install -g @deepseek-ai/dsh
+   npm install -g @everywhere-harness/ewh
    ```
 
 #### Opção 1: Compilar via Linha de Comando (Gradle)
@@ -181,7 +181,7 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 1. Pela página oficial do Marketplace: Acesse [Everywhere no JetBrains Marketplace (Plugin #35191)](https://plugins.jetbrains.com/plugin/35191) e clique em **Install to IntelliJ IDEA**.
 2. Ou diretamente pelo IntelliJ IDEA:
    - Abra `Settings` / `Preferências` (`Ctrl + Alt + S` ou `Cmd + ,`) ➔ **Plugins**.
-   - Na aba **Marketplace**, pesquise por `Everywhere DeepSeek Harness`.
+   - Na aba **Marketplace**, pesquise por `EveryWhere Harness`.
    - Clique em **Install** e reinicie a IDE se solicitado.
 
 #### Método 2: Instalar a partir do Arquivo Local (ZIP)
@@ -197,8 +197,8 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 
 ### 🎯 Como Usar
 
-1. Após a instalação, localize a aba **Everywhere** na barra lateral direita do editor (ou vá no menu superior `Tools` ➔ `Everywhere (DeepSeek Harness)` ➔ `Iniciar DeepSeek Harness`).
-2. Se a opção **Auto-Start** estiver habilitada, o DeepSeek Harness iniciará automaticamente na primeira abertura.
+1. Após a instalação, localize a aba **Everywhere** na barra lateral direita do editor (ou vá no menu superior `Tools` ➔ `EveryWhere Harness` ➔ `Iniciar EveryWhere Harness`).
+2. Se a opção **Auto-Start** estiver habilitada, o EveryWhere Harness iniciará automaticamente na primeira abertura.
 3. O agente terá acesso imediato à árvore de diretórios e arquivos do seu projeto.
 
 ### ⚙️ Configurações (Settings ➔ Tools ➔ Everywhere)
@@ -207,7 +207,7 @@ intellij/build/distributions/everywhere-intellij-1.2.6.zip
 |---|---|---|
 | **Auto Start** | `true` | Iniciar o agente automaticamente ao abrir a Tool Window |
 | **Port** | `0` | Porta do servidor web (0 atribui porta livre automaticamente) |
-| **Profile** | `"web"` | Perfil de execução do DeepSeek Harness (`web`, `headless`, `tui`) |
-| **DeepSeek API Key** | `""` | Chave da API DeepSeek (também aceita via variável `DEEPSEEK_API_KEY`) |
-| **Base URL** | `https://api.deepseek.com` | Endpoint base da API DeepSeek |
-| **Custom DSH Path** | `""` | Caminho personalizado para o binário `dsh` se não estiver no PATH padrão |
+| **Profile** | `"web"` | Perfil de execução do EveryWhere Harness (`web`, `headless`, `tui`) |
+| **EveryWhere API Key** | `""` | Chave da API EveryWhere (também aceita via variável `EVERYWHERE_API_KEY` / `DEEPSEEK_API_KEY`) |
+| **Base URL** | `https://api.deepseek.com` | Endpoint base da API EveryWhere |
+| **Custom DSH Path** | `""` | Caminho personalizado para o binário `ewh` / `dsh` se não estiver no PATH padrão |

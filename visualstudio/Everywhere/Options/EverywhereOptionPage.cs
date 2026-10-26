@@ -8,35 +8,35 @@ namespace Everywhere.Options
     [ComVisible(true)]
     public class EverywhereOptionPage : DialogPage
     {
-        [Category("DeepSeek Harness")]
+        [Category("EveryWhere Harness")]
         [DisplayName("Auto Start")]
-        [Description("Automatically start DeepSeek Harness when the tool window is opened.")]
+        [Description("Automatically start EveryWhere Harness when the tool window is opened.")]
         public bool AutoStart { get; set; } = true;
 
-        [Category("DeepSeek Harness")]
+        [Category("EveryWhere Harness")]
         [DisplayName("Port")]
-        [Description("Port for DeepSeek Harness Web server (0 for auto-assign).")]
+        [Description("Port for EveryWhere Harness Web server (0 for auto-assign).")]
         public int Port { get; set; } = 0;
 
-        [Category("DeepSeek Harness")]
+        [Category("EveryWhere Harness")]
         [DisplayName("Profile")]
-        [Description("DeepSeek Harness profile to boot (e.g. 'web').")]
+        [Description("EveryWhere Harness profile to boot (e.g. 'web').")]
         public string Profile { get; set; } = "web";
 
-        [Category("DeepSeek Harness")]
+        [Category("EveryWhere Harness")]
         [DisplayName("Custom DSH Path")]
-        [Description("Custom command or path to dsh executable. If empty, auto-detects from PATH or npm.")]
+        [Description("Custom command or path to harness executable. If empty, auto-detects from PATH or npm.")]
         public string CustomDshPath { get; set; } = "";
 
-        [Category("DeepSeek API")]
+        [Category("EveryWhere API")]
         [DisplayName("API Key")]
-        [Description("DeepSeek API Key. If empty, reads DEEPSEEK_API_KEY environment variable.")]
+        [Description("EveryWhere API Key. If empty, reads EVERYWHERE_API_KEY or DEEPSEEK_API_KEY environment variable.")]
         [PasswordPropertyText(true)]
         public string ApiKey { get; set; } = "";
 
-        [Category("DeepSeek API")]
+        [Category("EveryWhere API")]
         [DisplayName("Base URL")]
-        [Description("DeepSeek API Base URL.")]
+        [Description("EveryWhere API Base URL.")]
         public string BaseUrl { get; set; } = "https://api.deepseek.com";
     }
 }

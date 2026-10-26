@@ -88,7 +88,7 @@ namespace Everywhere.ToolWindows
                     StartOverlay.Visibility = Visibility.Visible;
                     TxtOverlayError.Visibility = Visibility.Collapsed;
                     BtnOverlayStart.IsEnabled = false;
-                    BtnOverlayStart.Content = "Iniciando DeepSeek Harness...";
+                    BtnOverlayStart.Content = "Iniciando EveryWhere Harness...";
                     break;
 
                 case HarnessStatus.Error:
@@ -108,7 +108,7 @@ namespace Everywhere.ToolWindows
                     StartOverlay.Visibility = Visibility.Visible;
                     TxtOverlayError.Visibility = Visibility.Collapsed;
                     BtnOverlayStart.IsEnabled = true;
-                    BtnOverlayStart.Content = "▶ Iniciar DeepSeek Harness";
+                    BtnOverlayStart.Content = "▶ Iniciar EveryWhere Harness";
                     break;
             }
         }

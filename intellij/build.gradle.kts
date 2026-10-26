@@ -32,7 +32,7 @@ tasks {
               <li>Workspace Project binding with automatic path discovery</li>
               <li>Autonomous process management with auto-recovery on port conflict (exit code 1)</li>
               <li>Toolbar controls: Start, Stop, Restart, Reload, Browser, Settings</li>
-              <li>DeepSeek settings page for custom binary, API Key, Base URL, port and profiles</li>
+              <li>EveryWhere settings page for custom binary, API Key, Base URL, port and profiles</li>
             </ul>
         """.trimIndent())
     }

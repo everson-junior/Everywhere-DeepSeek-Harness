@@ -17,7 +17,7 @@ public class EverywherePreferencePage extends FieldEditorPreferencePage implemen
     public EverywherePreferencePage() {
         super(GRID);
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setDescription("Configurações do DeepSeek Harness Runtime (Everywhere)");
+        setDescription("Configurações do EveryWhere Harness Runtime (Everywhere)");
     }
 
     @Override
@@ -41,19 +41,19 @@ public class EverywherePreferencePage extends FieldEditorPreferencePage implemen
 
         StringFieldEditor apiKeyEditor = new StringFieldEditor(
                 PreferenceConstants.P_API_KEY,
-                "&DeepSeek API Key (opcional, aceita via env):",
+                "&EveryWhere API Key (opcional, aceita via env):",
                 getFieldEditorParent());
         apiKeyEditor.getTextControl(getFieldEditorParent()).setEchoChar('*');
         addField(apiKeyEditor);
 
         addField(new StringFieldEditor(
                 PreferenceConstants.P_BASE_URL,
-                "&URL Base da API DeepSeek:",
+                "&URL Base da API EveryWhere:",
                 getFieldEditorParent()));
 
         FileFieldEditor dshPathEditor = new FileFieldEditor(
                 PreferenceConstants.P_CUSTOM_DSH_PATH,
-                "&Caminho customizado do executável 'dsh':",
+                "&Caminho customizado do executável (ewh / dsh):",
                 getFieldEditorParent());
         dshPathEditor.setEmptyStringAllowed(true);
         addField(dshPathEditor);

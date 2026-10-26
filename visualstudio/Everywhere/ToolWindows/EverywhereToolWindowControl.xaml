@@ -38,11 +38,11 @@
             <Border x:Name="StartOverlay" Background="#181818" Visibility="Visible">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="320">
                     <TextBlock Text="🌐 Everywhere" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" Margin="0,0,0,8" />
-                    <TextBlock Text="DeepSeek Harness Autonomous AI Agent" FontSize="12" Foreground="#888888" HorizontalAlignment="Center" Margin="0,0,0,16" />
+                    <TextBlock Text="EveryWhere Harness Autonomous AI Agent" FontSize="12" Foreground="#888888" HorizontalAlignment="Center" Margin="0,0,0,16" />
 
                     <TextBlock x:Name="TxtOverlayError" Text="" Foreground="#F44336" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" HorizontalAlignment="Center" Visibility="Collapsed" />
 
-                    <Button x:Name="BtnOverlayStart" Content="▶ Iniciar DeepSeek Harness" Background="#007ACC" Foreground="White" Padding="12,8" FontWeight="SemiBold" BorderThickness="0" Click="BtnStart_Click" Cursor="Hand" Margin="0,0,0,8" />
+                    <Button x:Name="BtnOverlayStart" Content="▶ Iniciar EveryWhere Harness" Background="#007ACC" Foreground="White" Padding="12,8" FontWeight="SemiBold" BorderThickness="0" Click="BtnStart_Click" Cursor="Hand" Margin="0,0,0,8" />
                     <Button x:Name="BtnOverlayStop" Content="🛑 Parar Serviço Anterior" Background="#333333" Foreground="#CCCCCC" Padding="12,6" BorderThickness="0" Click="BtnStop_Click" Cursor="Hand" Margin="0,0,0,12" />
 
                     <TextBlock Text="O agente interage diretamente com o código e arquivos da sua solução atual." FontSize="10" Foreground="#666666" TextWrapping="Wrap" TextAlignment="Center" />

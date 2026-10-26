@@ -21,26 +21,26 @@ class EverywhereConfigurable : Configurable {
     private val baseUrlField = JBTextField()
     private val customDshPathField = TextFieldWithBrowseButton()
 
-    override fun getDisplayName(): String = "Everywhere DeepSeek Harness"
+    override fun getDisplayName(): String = "EveryWhere Harness"
 
     override fun createComponent(): JComponent {
         customDshPathField.addBrowseFolderListener(
-            "Selecionar Executável DeepSeek Harness (dsh)",
-            "Localize o binário dsh ou dsh.cmd em seu sistema",
+            "Selecionar Executável EveryWhere Harness (ewh / dsh)",
+            "Localize o binário ewh, dsh ou executável em seu sistema",
             null,
             FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor()
         )
 
         mainPanel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(JBLabel("Caminho personalizado do DSH:"), customDshPathField, 1, false)
+            .addLabeledComponent(JBLabel("Caminho personalizado do executável:"), customDshPathField, 1, false)
             .addTooltip("Deixe em branco para detecção automática no PATH/npm/pnpm padrão.")
             .addSeparator()
             .addLabeledComponent(JBLabel("Porta do servidor (0 = automática):"), portField, 1, false)
             .addLabeledComponent(JBLabel("Perfil de execução:"), profileField, 1, false)
             .addTooltip("Padrão: 'web' (outras opções incluem 'headless' ou 'tui').")
             .addSeparator()
-            .addLabeledComponent(JBLabel("DeepSeek API Key:"), apiKeyField, 1, false)
-            .addTooltip("Opcional se a variável de ambiente DEEPSEEK_API_KEY já estiver configurada.")
+            .addLabeledComponent(JBLabel("EveryWhere API Key:"), apiKeyField, 1, false)
+            .addTooltip("Opcional se a variável de ambiente EVERYWHERE_API_KEY ou DEEPSEEK_API_KEY já estiver configurada.")
             .addLabeledComponent(JBLabel("Base URL da API:"), baseUrlField, 1, false)
             .addSeparator()
             .addComponent(autoStartCheckBox, 1)

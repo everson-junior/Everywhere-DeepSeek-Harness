@@ -1,7 +1,7 @@
 {
   "name": "everywhere",
-  "displayName": "Everywhere DeepSeek Harness",
-  "description": "Use everywhere DeepSeek Harness: autonomous AI agent directly inside Visual Studio Code sidebar and editor",
+  "displayName": "EveryWhere Harness",
+  "description": "Use EveryWhere Harness: autonomous AI agent directly inside Visual Studio Code sidebar and editor",
   "version": "1.2.6",
   "icon": "assets/icon/icon.png",
   "publisher": "everson-junior",
@@ -20,6 +20,8 @@
     "Other"
   ],
   "keywords": [
+    "everywhere",
+    "everywhere-harness",
     "deepseek",
     "harness",
     "agent",
@@ -37,181 +39,181 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "deepseek-harness-sidebar",
-          "title": "DeepSeek Harness",
-          "icon": "media/deepseek.svg"
+          "id": "everywhere-harness-sidebar",
+          "title": "EveryWhere Harness",
+          "icon": "media/everywhere.svg"
         }
       ]
     },
     "views": {
-      "deepseek-harness-sidebar": [
+      "everywhere-harness-sidebar": [
         {
-          "id": "deepseek.harnessView",
-          "name": "DeepSeek Harness",
+          "id": "everywhere.harnessView",
+          "name": "EveryWhere Harness",
           "type": "webview"
         }
       ]
     },
     "commands": [
       {
-        "command": "deepseek.startHarness",
+        "command": "everywhere.startHarness",
         "title": "Start Harness",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(play)"
       },
       {
-        "command": "deepseek.stopHarness",
+        "command": "everywhere.stopHarness",
         "title": "Stop Harness",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "deepseek.restartHarness",
+        "command": "everywhere.restartHarness",
         "title": "Restart Harness",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(debug-restart)"
       },
       {
-        "command": "deepseek.debugHarness",
+        "command": "everywhere.debugHarness",
         "title": "Debug Harness in Project...",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(debug-alt)"
       },
       {
-        "command": "deepseek.openFullView",
+        "command": "everywhere.openFullView",
         "title": "Open in Editor Tab",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(link-external)"
       },
       {
-        "command": "deepseek.focusHarness",
-        "title": "Open DeepSeek Harness Chat",
-        "category": "DeepSeek Harness",
+        "command": "everywhere.focusHarness",
+        "title": "Open EveryWhere Harness Chat",
+        "category": "EveryWhere Harness",
         "icon": "$(comment-discussion)"
       },
       {
-        "command": "deepseek.moveToRightSidebar",
+        "command": "everywhere.moveToRightSidebar",
         "title": "Move to Right Sidebar",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(layout-sidebar-right)"
       },
       {
-        "command": "deepseek.openInBrowser",
+        "command": "everywhere.openInBrowser",
         "title": "Open in External Browser",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(globe)"
       },
       {
-        "command": "deepseek.showLogs",
+        "command": "everywhere.showLogs",
         "title": "Show Harness Logs",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(output)"
       },
       {
-        "command": "deepseek.installHarness",
-        "title": "Install DeepSeek Harness",
-        "category": "DeepSeek Harness",
+        "command": "everywhere.installHarness",
+        "title": "Install EveryWhere Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(cloud-download)"
       },
       {
-        "command": "deepseek.checkHarness",
-        "title": "Check DeepSeek Harness Installation",
-        "category": "DeepSeek Harness",
+        "command": "everywhere.checkHarness",
+        "title": "Check EveryWhere Harness Installation",
+        "category": "EveryWhere Harness",
         "icon": "$(sync)"
       },
       {
-        "command": "deepseek.openSettings",
+        "command": "everywhere.openSettings",
         "title": "Configure Settings",
-        "category": "DeepSeek Harness",
+        "category": "EveryWhere Harness",
         "icon": "$(gear)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "deepseek.startHarness",
-          "when": "view == deepseek.harnessView && !deepseek.isRunning",
+          "command": "everywhere.startHarness",
+          "when": "view == everywhere.harnessView && !everywhere.isRunning",
           "group": "navigation@1"
         },
         {
-          "command": "deepseek.stopHarness",
-          "when": "view == deepseek.harnessView && deepseek.isRunning",
+          "command": "everywhere.stopHarness",
+          "when": "view == everywhere.harnessView && everywhere.isRunning",
           "group": "navigation@1"
         },
         {
-          "command": "deepseek.restartHarness",
-          "when": "view == deepseek.harnessView && deepseek.isRunning",
+          "command": "everywhere.restartHarness",
+          "when": "view == everywhere.harnessView && everywhere.isRunning",
           "group": "navigation@2"
         },
         {
-          "command": "deepseek.debugHarness",
-          "when": "view == deepseek.harnessView",
+          "command": "everywhere.debugHarness",
+          "when": "view == everywhere.harnessView",
           "group": "navigation@2"
         },
         {
-          "command": "deepseek.openFullView",
-          "when": "view == deepseek.harnessView",
+          "command": "everywhere.openFullView",
+          "when": "view == everywhere.harnessView",
           "group": "navigation@3"
         },
         {
-          "command": "deepseek.showLogs",
-          "when": "view == deepseek.harnessView",
+          "command": "everywhere.showLogs",
+          "when": "view == everywhere.harnessView",
           "group": "navigation@4"
         },
         {
-          "command": "deepseek.moveToRightSidebar",
-          "when": "view == deepseek.harnessView",
+          "command": "everywhere.moveToRightSidebar",
+          "when": "view == everywhere.harnessView",
           "group": "navigation@5"
         },
         {
-          "command": "deepseek.openInBrowser",
-          "when": "view == deepseek.harnessView",
+          "command": "everywhere.openInBrowser",
+          "when": "view == everywhere.harnessView",
           "group": "navigation@6"
         },
         {
-          "command": "deepseek.openSettings",
-          "when": "view == deepseek.harnessView",
+          "command": "everywhere.openSettings",
+          "when": "view == everywhere.harnessView",
           "group": "navigation@7"
         }
       ]
     },
     "configuration": {
-      "title": "DeepSeek Harness",
+      "title": "EveryWhere Harness",
       "properties": {
-        "deepseek.dshPath": {
+        "everywhere.dshPath": {
           "type": "string",
           "default": "",
-          "description": "Custom command or path to dsh (e.g. 'dsh', 'pnpm dsh', or '/path/to/bin.ts'). If empty, auto-detects from workspace or PATH."
+          "description": "Custom command or path to harness executable (e.g. 'ewh', 'dsh', 'pnpm dsh', or '/path/to/bin.ts'). If empty, auto-detects from workspace or PATH."
         },
-        "deepseek.projectPath": {
+        "everywhere.projectPath": {
           "type": "string",
           "default": "",
-          "description": "Project directory used as the working directory when DeepSeek Harness starts. Empty uses the first open workspace folder."
+          "description": "Project directory used as the working directory when EveryWhere Harness starts. Empty uses the first open workspace folder."
         },
-        "deepseek.port": {
+        "everywhere.port": {
           "type": "number",
           "default": 0,
-          "description": "Port for DeepSeek Harness Web server (0 for auto-assigned random port)."
+          "description": "Port for EveryWhere Harness Web server (0 for auto-assigned random port)."
         },
-        "deepseek.profile": {
+        "everywhere.profile": {
           "type": "string",
           "default": "web",
-          "description": "DSH profile to run (e.g. 'web')."
+          "description": "Harness profile to run (e.g. 'web')."
         },
-        "deepseek.autoStart": {
+        "everywhere.autoStart": {
           "type": "boolean",
           "default": false,
-          "description": "Automatically start the DeepSeek Harness runtime when VS Code opens or the view is revealed."
+          "description": "Automatically start the EveryWhere Harness runtime when VS Code opens or the view is revealed."
         },
-        "deepseek.apiKey": {
+        "everywhere.apiKey": {
           "type": "string",
           "default": "",
-          "description": "DeepSeek API Key. If blank, reads DEEPSEEK_API_KEY from environment or .env."
+          "description": "EveryWhere API Key. If blank, reads EVERYWHERE_API_KEY or DEEPSEEK_API_KEY from environment or .env."
         },
-        "deepseek.baseUrl": {
+        "everywhere.baseUrl": {
           "type": "string",
           "default": "https://api.deepseek.com",
-          "description": "DeepSeek API Base URL."
+          "description": "EveryWhere API Base URL."
         }
       }
     }

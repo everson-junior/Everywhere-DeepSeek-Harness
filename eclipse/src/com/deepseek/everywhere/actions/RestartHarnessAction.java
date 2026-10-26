@@ -8,7 +8,7 @@ public class RestartHarnessAction extends Action {
 
     public RestartHarnessAction() {
         super("Reiniciar", Activator.getImageDescriptor("icons/restart.png"));
-        setToolTipText("Reiniciar DeepSeek Harness");
+        setToolTipText("Reiniciar EveryWhere Harness");
     }
 
     @Override

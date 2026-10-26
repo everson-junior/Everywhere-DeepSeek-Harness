@@ -9,7 +9,7 @@ public class StartHarnessAction extends Action {
 
     public StartHarnessAction() {
         super("Iniciar", Activator.getImageDescriptor("icons/start.png"));
-        setToolTipText("Iniciar DeepSeek Harness");
+        setToolTipText("Iniciar EveryWhere Harness");
     }
 
     @Override

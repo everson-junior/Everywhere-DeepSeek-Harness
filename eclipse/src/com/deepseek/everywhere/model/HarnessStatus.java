@@ -1,7 +1,7 @@
 package com.deepseek.everywhere.model;
 
 /**
- * Representa os estados possíveis do runtime DeepSeek Harness.
+ * Representa os estados possíveis do runtime EveryWhere Harness.
  */
 public enum HarnessStatus {
     STOPPED,

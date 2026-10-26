@@ -10,7 +10,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 
-class StartHarnessAction : AnAction("Iniciar", "Inicia o serviço DeepSeek Harness", EverywhereIcons.START), DumbAware {
+class StartHarnessAction : AnAction("Iniciar", "Inicia o serviço EveryWhere Harness", EverywhereIcons.START), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         DshManagerService.getInstance(project).start()
@@ -27,7 +27,7 @@ class StartHarnessAction : AnAction("Iniciar", "Inicia o serviço DeepSeek Harne
     }
 }
 
-class StopHarnessAction : AnAction("Parar", "Interrompe o serviço DeepSeek Harness e limpa processos", EverywhereIcons.STOP), DumbAware {
+class StopHarnessAction : AnAction("Parar", "Interrompe o serviço EveryWhere Harness e limpa processos", EverywhereIcons.STOP), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         DshManagerService.getInstance(project).stop()
@@ -44,7 +44,7 @@ class StopHarnessAction : AnAction("Parar", "Interrompe o serviço DeepSeek Harn
     }
 }
 
-class RestartHarnessAction : AnAction("Reiniciar", "Reinicia o DeepSeek Harness", EverywhereIcons.RESTART), DumbAware {
+class RestartHarnessAction : AnAction("Reiniciar", "Reinicia o EveryWhere Harness", EverywhereIcons.RESTART), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         DshManagerService.getInstance(project).restart()
@@ -52,13 +52,13 @@ class RestartHarnessAction : AnAction("Reiniciar", "Reinicia o DeepSeek Harness"
 }
 
 class ReloadWebViewAction(private val reloadCallback: (() -> Unit)? = null) :
-    AnAction("Recarregar", "Recarrega a página da interface DeepSeek Harness", EverywhereIcons.RELOAD), DumbAware {
+    AnAction("Recarregar", "Recarrega a página da interface EveryWhere Harness", EverywhereIcons.RELOAD), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
         reloadCallback?.invoke()
     }
 }
 
-class OpenInBrowserAction : AnAction("Abrir no Navegador", "Abre o DeepSeek Harness no navegador web padrão", EverywhereIcons.BROWSER), DumbAware {
+class OpenInBrowserAction : AnAction("Abrir no Navegador", "Abre o EveryWhere Harness no navegador web padrão", EverywhereIcons.BROWSER), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val url = DshManagerService.getInstance(project).activeUrl ?: "http://127.0.0.1:3080"

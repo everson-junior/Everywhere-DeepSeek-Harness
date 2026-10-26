@@ -9,7 +9,7 @@ public class StopHarnessAction extends Action {
 
     public StopHarnessAction() {
         super("Parar", Activator.getImageDescriptor("icons/stop.png"));
-        setToolTipText("Parar DeepSeek Harness e limpar processos órfãos");
+        setToolTipText("Parar EveryWhere Harness e limpar processos órfãos");
     }
 
     @Override

@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Everywhere DeepSeek Harness
+Bundle-Name: EveryWhere Harness
 Bundle-SymbolicName: com.deepseek.everywhere;singleton:=true
-Bundle-Version: 1.2.1
+Bundle-Version: 1.0.0
 Bundle-Activator: com.deepseek.everywhere.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

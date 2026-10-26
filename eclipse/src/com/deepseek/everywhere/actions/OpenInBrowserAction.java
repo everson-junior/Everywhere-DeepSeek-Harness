@@ -12,7 +12,7 @@ public class OpenInBrowserAction extends Action {
 
     public OpenInBrowserAction() {
         super("Abrir no Navegador", Activator.getImageDescriptor("icons/browser.png"));
-        setToolTipText("Abrir DeepSeek Harness no navegador web padrão");
+        setToolTipText("Abrir EveryWhere Harness no navegador web padrão");
     }
 
     @Override

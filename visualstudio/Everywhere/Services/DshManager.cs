@@ -58,11 +58,11 @@ namespace Everywhere.Services
                 if (outWindow != null)
                 {
                     Guid customGuid = new Guid("9694d93f-67a3-41bb-9467-f4e9a3bdf01a");
-                    outWindow.CreatePane(ref customGuid, "Everywhere (DeepSeek Harness)", 1, 1);
+                    outWindow.CreatePane(ref customGuid, "EveryWhere Harness", 1, 1);
                     outWindow.GetPane(ref customGuid, out _outputPane);
                 }
             }
-            _outputPane?.OutputString($"[Everywhere] {message}\n");
+            _outputPane?.OutputString($"[EveryWhere] {message}\n");
             _outputPane?.Activate();
         }
 
@@ -90,12 +90,19 @@ namespace Everywhere.Services
 
             var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             string[] candidates = {
+                Path.Combine(appData, "npm", "ewh.cmd"),
+                Path.Combine(localAppData, "npm", "ewh.cmd"),
+                Path.Combine(userHome, ".pnpm", "ewh.cmd"),
+                Path.Combine(userHome, ".local", "share", "pnpm", "ewh.cmd"),
                 Path.Combine(appData, "npm", "dsh.cmd"),
                 Path.Combine(localAppData, "npm", "dsh.cmd"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".pnpm", "dsh.cmd"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share", "pnpm", "dsh.cmd"),
+                Path.Combine(userHome, ".pnpm", "dsh.cmd"),
+                Path.Combine(userHome, ".local", "share", "pnpm", "dsh.cmd"),
+                "ewh.cmd",
+                "ewh",
                 "dsh.cmd",
                 "dsh"
             };
@@ -108,7 +115,7 @@ namespace Everywhere.Services
                 }
             }
 
-            return "dsh.cmd";
+            return "ewh.cmd";
         }
 
         public class RunningServiceInfo
@@ -120,7 +127,11 @@ namespace Everywhere.Services
         public static string GetSavedSessionFile()
         {
             var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return Path.Combine(userHome, ".dsh", "last-session.json");
+            var ewhFile = Path.Combine(userHome, ".ewh", "last-session.json");
+            if (File.Exists(ewhFile)) return ewhFile;
+            var dshFile = Path.Combine(userHome, ".dsh", "last-session.json");
+            if (File.Exists(dshFile)) return dshFile;
+            return ewhFile;
         }
 
         public static void SaveSession(string rawUrl, int port, string token)
@@ -229,13 +240,13 @@ namespace Everywhere.Services
             var existing = await FindRunningDshAsync(checkPort);
             if (existing != null)
             {
-                Log($"[DeepSeek Harness] Backend ready at:\n{existing.Url}");
+                Log($"[EveryWhere Harness] Backend ready at:\n{existing.Url}");
                 SetStatus(HarnessStatus.Running, existing.Url, existing.Port);
                 return existing.Url;
             }
 
             SetStatus(HarnessStatus.Starting);
-            Log("Starting DeepSeek Harness runtime...");
+            Log("Starting EveryWhere Harness runtime...");
 
             var executable = FindDshExecutable(options?.CustomDshPath ?? "");
             var cwd = ResolveWorkspaceDirectory();
@@ -250,8 +261,8 @@ namespace Everywhere.Services
             {
                 if (!tcs.Task.IsCompleted)
                 {
-                    SetStatus(HarnessStatus.Error, error: "Timeout waiting for DeepSeek Harness to start.");
-                    tcs.TrySetException(new TimeoutException("Timeout waiting for DeepSeek Harness to start."));
+                    SetStatus(HarnessStatus.Error, error: "Timeout waiting for EveryWhere Harness to start.");
+                    tcs.TrySetException(new TimeoutException("Timeout waiting for EveryWhere Harness to start."));
                 }
             });
 
@@ -268,7 +279,7 @@ namespace Everywhere.Services
                     if (runInfo != null && !tcs.Task.IsCompleted)
                     {
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                        Log($"[DeepSeek Harness] Backend ready at:\n{runInfo.Url}");
+                        Log($"[EveryWhere Harness] Backend ready at:\n{runInfo.Url}");
                         SetStatus(HarnessStatus.Running, runInfo.Url, runInfo.Port);
                         tcs.TrySetResult(runInfo.Url);
                         return;
@@ -291,15 +302,17 @@ namespace Everywhere.Services
 
                 if (!string.IsNullOrWhiteSpace(options?.ApiKey))
                 {
+                    startInfo.EnvironmentVariables["EVERYWHERE_API_KEY"] = options.ApiKey!;
                     startInfo.EnvironmentVariables["DEEPSEEK_API_KEY"] = options.ApiKey!;
                 }
                 if (!string.IsNullOrWhiteSpace(options?.BaseUrl))
                 {
+                    startInfo.EnvironmentVariables["EVERYWHERE_BASE_URL"] = options.BaseUrl!;
                     startInfo.EnvironmentVariables["DEEPSEEK_BASE_URL"] = options.BaseUrl!;
                 }
 
                 _currentProcess = new Process { StartInfo = startInfo };
-                var urlRegex = new Regex(@"dsh web:\s+(https?://[^\s\)]+)", RegexOptions.IgnoreCase);
+                var urlRegex = new Regex(@"(?:ewh|dsh) web:\s+(https?://[^\s\)]+)", RegexOptions.IgnoreCase);
 
                 _currentProcess.OutputDataReceived += async (s, e) =>
                 {
@@ -322,7 +335,7 @@ namespace Everywhere.Services
                         }
                         catch { }
 
-                        Log($"[DeepSeek Harness] Backend ready at:\n{url}");
+                        Log($"[EveryWhere Harness] Backend ready at:\n{url}");
 
                         if (!tcs.Task.IsCompleted)
                         {
@@ -352,7 +365,7 @@ namespace Everywhere.Services
                         var runningExisting = await FindRunningDshAsync(checkPort);
                         if (runningExisting != null)
                         {
-                            Log($"[DeepSeek Harness] Backend ready at:\n{runningExisting.Url}");
+                            Log($"[EveryWhere Harness] Backend ready at:\n{runningExisting.Url}");
                             SetStatus(HarnessStatus.Running, runningExisting.Url, runningExisting.Port);
                             tcs.TrySetResult(runningExisting.Url);
                             return;
@@ -379,7 +392,7 @@ namespace Everywhere.Services
                             }
                         }
 
-                        var errMsg = $"DeepSeek Harness exited with code {exitCode}";
+                        var errMsg = $"EveryWhere Harness exited with code {exitCode}";
                         SetStatus(HarnessStatus.Error, error: errMsg);
                         tcs.TrySetException(new Exception(errMsg));
                     }
@@ -405,7 +418,7 @@ namespace Everywhere.Services
         public async Task StopAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            Log("Stopping DeepSeek Harness and cleaning orphan processes...");
+            Log("Stopping EveryWhere Harness and cleaning orphan processes...");
 
             lock (_lock)
             {
@@ -423,7 +436,7 @@ namespace Everywhere.Services
             // Terminate orphan processes on known DSH ports (3080, 3000 or custom)
             await KillOrphanProcessesAsync();
             SetStatus(HarnessStatus.Stopped);
-            Log("DeepSeek Harness stopped.");
+            Log("EveryWhere Harness stopped.");
         }
 
         public async Task RestartAsync()
@@ -439,17 +452,20 @@ namespace Everywhere.Services
             {
                 try
                 {
-                    // Kill any orphan dsh processes on Windows
-                    var killProc = new ProcessStartInfo
+                    // Kill any orphan ewh or dsh processes on Windows
+                    foreach (var exeName in new[] { "ewh.exe", "dsh.exe" })
                     {
-                        FileName = "taskkill.exe",
-                        Arguments = "/F /IM dsh.exe /T",
-                        CreateNoWindow = true,
-                        UseShellExecute = false
-                    };
-                    using (var p = Process.Start(killProc))
-                    {
-                        p?.WaitForExit(2000);
+                        var killProc = new ProcessStartInfo
+                        {
+                            FileName = "taskkill.exe",
+                            Arguments = $"/F /IM {exeName} /T",
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        };
+                        using (var p = Process.Start(killProc))
+                        {
+                            p?.WaitForExit(2000);
+                        }
                     }
                 }
                 catch { }

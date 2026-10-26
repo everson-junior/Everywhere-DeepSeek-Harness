@@ -1,13 +1,13 @@
 <div align="center">
 
-# Everywhere DeepSeek Harness for Eclipse IDE 🌐⚡
+# EveryWhere Harness for Eclipse IDE 🌐⚡
 
 [English](#-english) • [Português](#-português)
 
 [![Eclipse IDE](https://img.shields.io/badge/Eclipse%20IDE-2026--09%20(4.41.0)-2c2255?logo=eclipseide)](https://eclipse.org/)
 [![Java Runtime](https://img.shields.io/badge/Java-17%2B%20%7C%2025-orange?logo=openjdk)](https://openjdk.org/)
 [![Embedded Browser](https://img.shields.io/badge/SWT%20Browser-WebKitGTK%20%7C%20Edge%20%7C%20WebKit-blue)]()
-[![DeepSeek](https://img.shields.io/badge/AI-DeepSeek--V3%20%7C%20DeepSeek--R1-007acc)](https://deepseek.com)
+[![EveryWhere](https://img.shields.io/badge/AI-EveryWhere-007acc)](https://deepseek.com)
 [![Status](https://img.shields.io/badge/Status-Ready-success)]()
 
 <br/>
@@ -24,24 +24,24 @@
 
 ## 🇺🇸 English
 
-**Everywhere DeepSeek Harness** is the official extension developed for the **Eclipse IDE**, with validated native support for **Eclipse IDE for Java Developers (2026-09 / 4.41.0)** and compatible releases.
+**EveryWhere Harness** is the extension developed for the **Eclipse IDE**, with validated native support for **Eclipse IDE for Java Developers (2026-09 / 4.41.0)** and compatible releases.
 
-It embeds the official **DeepSeek Harness (`dsh`)** runtime inside a native Eclipse View using the **SWT Browser** widget, directly connecting **DeepSeek-V3** and **DeepSeek-R1 (Reasoner)** autonomous models to your development workspace.
+It embeds the **EveryWhere Harness (`ewh` / `dsh`)** runtime inside a native Eclipse View using the **SWT Browser** widget, directly connecting autonomous AI reasoning to your development workspace.
 
 ### 🌟 Features
 
-- 🪟 **Native View with Embedded Browser**: Displays the DeepSeek Harness interface inside a dedicated Eclipse View (`Window -> Show View -> Other... -> Everywhere`).
+- 🪟 **Native View with Embedded Browser**: Displays the EveryWhere Harness interface inside a dedicated Eclipse View (`Window -> Show View -> Other... -> Everywhere`).
 - 📂 **Workspace & Project Binding**: Automatically booted with the active Eclipse workspace or project directory (`IWorkspace` / `IProject`), enabling contextual code inspection and editing.
 - 🔄 **Intelligent Auto-Recovery (Exit Code 1)**: Automated port conflict detection (3080/3000) or unexpected terminations, terminating orphaned processes (`fuser`, `pkill`, `taskkill`) and reconnecting transparently.
-- 📄 **Integrated Output Console**: Real-time log stream in the standard Eclipse Console view (`Console` ➔ `Everywhere DeepSeek Harness`) with color-coded standard output and errors.
+- 📄 **Integrated Output Console**: Real-time log stream in the standard Eclipse Console view (`Console` ➔ `EveryWhere Harness`) with color-coded standard output and errors.
 - 🧭 **Dedicated View Toolbar**:
-  - ▶ **Start**: Boots the `dsh` runtime.
+  - ▶ **Start**: Boots the `ewh` / `dsh` runtime.
   - 🛑 **Stop**: Halts the process and releases network ports.
   - 🔄 **Restart**: Restarts the assistant session.
   - 🔁 **Reload**: Refreshes the embedded browser view.
   - 🌐 **Open in Browser**: Opens the web interface in your default system browser.
   - ⚙️ **Settings**: Direct shortcut to plugin preferences.
-- ⚙️ **Eclipse Preferences Page**: Fully integrated under `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
+- ⚙️ **Eclipse Preferences Page**: Fully integrated under `Window` ➔ `Preferences` ➔ `EveryWhere Harness`.
 - ⌨️ **Workbench Menu & Commands**: Dedicated `Everywhere` menu on the main menu bar to start, stop, and toggle the view.
 
 ### 🚀 Build & Package
@@ -49,9 +49,9 @@ It embeds the official **DeepSeek Harness (`dsh`)** runtime inside a native Ecli
 #### Prerequisites
 1. **Eclipse IDE 2026-09 (4.41.0)** or any compatible Eclipse distribution.
 2. **Java 17+** or **Java 25** (Eclipse bundled compiler is automatically detected).
-3. **DeepSeek Harness CLI**:
+3. **EveryWhere Harness CLI**:
    ```bash
-   npm install -g @deepseek-ai/dsh
+   npm install -g @everywhere-harness/ewh
    ```
 
 #### Quick Build & Local Installation
@@ -91,10 +91,10 @@ If you prefer copying the `.jar` bundle manually:
 1. Open **Eclipse IDE**.
 2. Open the Everywhere view:
    - Menu `Window` ➔ `Show View` ➔ `Other...`
-   - Expand the **Everywhere** category and select **Everywhere (DeepSeek Harness)**.
-   - Or click the DeepSeek icon on the top workbench toolbar.
-3. If **Auto Start** is enabled, DeepSeek Harness will boot automatically.
-4. To monitor diagnostics, switch to the **Console** view and select `Everywhere - DeepSeek Harness`.
+   - Expand the **Everywhere** category and select **EveryWhere Harness**.
+   - Or click the Everywhere icon on the top workbench toolbar.
+3. If **Auto Start** is enabled, EveryWhere Harness will boot automatically.
+4. To monitor diagnostics, switch to the **Console** view and select `EveryWhere Harness`.
 
 ### ⚙️ Preferences (Window ➔ Preferences ➔ Everywhere)
 
@@ -103,9 +103,9 @@ If you prefer copying the `.jar` bundle manually:
 | **Auto Start** | `true` | Automatically starts the agent when opening the View |
 | **HTTP Server Port** | `0` | Local port (0 assigns an available port automatically) |
 | **Harness Profile** | `"web"` | Execution profile (`web`, `headless`, `tui`) |
-| **DeepSeek API Key** | `""` | DeepSeek API key (also inherited from `DEEPSEEK_API_KEY`) |
-| **API Base URL** | `https://api.deepseek.com` | DeepSeek API endpoint base URL |
-| **Custom 'dsh' Path** | `""` | Custom binary path if `dsh` is not in standard PATH |
+| **EveryWhere API Key** | `""` | EveryWhere API key (also inherited from `EVERYWHERE_API_KEY` / `DEEPSEEK_API_KEY`) |
+| **API Base URL** | `https://api.deepseek.com` | EveryWhere API endpoint base URL |
+| **Custom 'dsh' Path** | `""` | Custom binary path if `ewh` / `dsh` is not in standard PATH |
 
 ### 🏛️ Architecture & Project Structure
 
@@ -135,34 +135,34 @@ eclipse/
 
 ## 🇧🇷 Português
 
-Esta é a extensão oficial do **Everywhere** desenvolvida para o **Eclipse IDE**, com suporte nativo e validado para **Eclipse IDE for Java Developers (2026-09 / 4.41.0, Build id: 20260903-0720)** e versões compatíveis.
+Esta é a extensão oficial do **EveryWhere** desenvolvida para o **Eclipse IDE**, com suporte nativo e validado para **Eclipse IDE for Java Developers (2026-09 / 4.41.0, Build id: 20260903-0720)** e versões compatíveis.
 
-Ela incorpora o runtime oficial do **DeepSeek Harness (`dsh`)** em uma View nativa do Eclipse utilizando o widget **SWT Browser**, conectando os modelos autônomos **DeepSeek-V3** e **DeepSeek-R1** diretamente ao seu workspace de desenvolvimento.
+Ela incorpora o runtime oficial do **EveryWhere Harness (`ewh` / `dsh`)** em uma View nativa do Eclipse utilizando o widget **SWT Browser**, conectando os modelos autônomos diretamente ao seu workspace de desenvolvimento.
 
 ### 🌟 Funcionalidades
 
-- 🪟 **View Nativa com Navegador Embutido**: Exibe a interface do DeepSeek Harness diretamente em uma aba/view do Eclipse (`Window -> Show View -> Other... -> Everywhere`).
+- 🪟 **View Nativa com Navegador Embutido**: Exibe a interface do EveryWhere Harness diretamente em uma aba/view do Eclipse (`Window -> Show View -> Other... -> Everywhere`).
 - 📂 **Workspace & Project Binding**: O assistente é iniciado com o diretório do projeto ou workspace atualmente ativo (`IWorkspace` / `IProject`), permitindo inspeção, criação e edição de código contextual.
 - 🔄 **Auto-Recuperação Inteligente (Exit Code 1)**: Detecção automática de conflito de portas (3080/3000) ou encerramento inesperado, finalizando processos órfãos (`fuser`, `pkill`, `taskkill`) e reiniciando a conexão de forma transparente.
-- 📄 **Console de Logs Integrado**: Canal de log em tempo real na aba padrão do Eclipse (`Console` ➔ `Everywhere DeepSeek Harness`) com formatação e diferenciação por cores de saída e erro.
+- 📄 **Console de Logs Integrado**: Canal de log em tempo real na aba padrão do Eclipse (`Console` ➔ `EveryWhere Harness`) com formatação e diferenciação por cores de saída e erro.
 - 🧭 **Barra de Ferramentas Dedicada (View Toolbar)**:
-  - ▶ **Iniciar**: Inicia o runtime `dsh`.
+  - ▶ **Iniciar**: Inicia o runtime `ewh`.
   - 🛑 **Parar**: Interrompe o processo e libera portas de rede.
   - 🔄 **Reiniciar**: Reinicia a sessão do assistente.
   - 🔁 **Recarregar**: Atualiza a página do navegador embutido.
   - 🌐 **Abrir no Navegador**: Abre a interface web no browser padrão do sistema operacional.
   - ⚙️ **Configurações**: Acesso direto às preferências do plugin.
-- ⚙️ **Página de Preferências do Eclipse**: Integrada ao menu padrão `Window` ➔ `Preferences` ➔ `Everywhere DeepSeek Harness`.
-- ⌨️ **Menu e Atalhos no Workbench**: Menu `Everywhere` na barra principal com comandos para iniciar, parar e abrir a visão.
+- ⚙️ **Página de Preferências do Eclipse**: Integrada ao menu padrão `Window` ➔ `Preferences` ➔ `EveryWhere Harness`.
+- ⌨️ **Menu e Atalhos no Workbench**: Menu `EveryWhere` na barra principal com comandos para iniciar, parar e abrir a visão.
 
 ### 🚀 Como Compilar e Empacotar o Plugin
 
 #### Pré-requisitos
 1. **Eclipse IDE 2026-09 (4.41.0)** ou qualquer instalação Eclipse compatível.
 2. **Java 17+** ou **Java 25** (o compilador bundled do Eclipse é detectado automaticamente).
-3. **DeepSeek Harness CLI**:
+3. **EveryWhere Harness CLI**:
    ```bash
-   npm install -g @deepseek-ai/dsh
+   npm install -g @everywhere-harness/ewh
    ```
 
 #### Compilação e Instalação Rápida
@@ -202,24 +202,24 @@ Se preferir copiar manualmente o arquivo `.jar`:
 ### 🎯 Como Usar no Eclipse
 
 1. Abra o **Eclipse IDE 2026-09**.
-2. Abra a visão Everywhere:
+2. Abra a visão EveryWhere:
    - Menu `Window` ➔ `Show View` ➔ `Other...`
-   - Expanda a categoria **Everywhere** e selecione **Everywhere (DeepSeek Harness)**.
-   - Ou clique no ícone do DeepSeek na barra de ferramentas superior.
-3. Se a opção **Auto Start** estiver habilitada, o DeepSeek Harness iniciará automaticamente.
-4. Caso esteja parado, clique no botão **▶ Iniciar DeepSeek Harness** na tela inicial ou na barra de ações.
-5. Para acompanhar diagnósticos, abra a visualização **Console** e selecione o console `Everywhere - DeepSeek Harness`.
+   - Expanda a categoria **EveryWhere** e selecione **EveryWhere Harness**.
+   - Ou clique no ícone do EveryWhere na barra de ferramentas superior.
+3. Se a opção **Auto Start** estiver habilitada, o EveryWhere Harness iniciará automaticamente.
+4. Caso esteja parado, clique no botão **▶ Iniciar EveryWhere Harness** na tela inicial ou na barra de ações.
+5. Para acompanhar diagnósticos, abra a visualização **Console** e selecione o console `EveryWhere Harness`.
 
-### ⚙️ Configurações (Window ➔ Preferences ➔ Everywhere)
+### ⚙️ Configurações (Window ➔ Preferences ➔ EveryWhere Harness)
 
 | Opção | Padrão | Descrição |
 |---|---|---|
 | **Iniciar automaticamente** | `true` | Inicia o runtime automaticamente ao abrir a visão |
 | **Porta do Servidor HTTP** | `0` | Porta local (0 atribui porta livre automaticamente) |
-| **Perfil do Harness** | `"web"` | Perfil de inicialização do DeepSeek Harness (`web`, `headless`, `tui`) |
-| **DeepSeek API Key** | `""` | Chave de API DeepSeek (também herdada de `DEEPSEEK_API_KEY`) |
-| **URL Base da API** | `https://api.deepseek.com` | Endpoint da API DeepSeek |
-| **Caminho customizado 'dsh'** | `""` | Caminho personalizado para o binário `dsh` caso não esteja no PATH |
+| **Perfil do Harness** | `"web"` | Perfil de inicialização do EveryWhere Harness (`web`, `headless`, `tui`) |
+| **EveryWhere API Key** | `""` | Chave de API EveryWhere (também herdada de `EVERYWHERE_API_KEY` ou `DEEPSEEK_API_KEY`) |
+| **URL Base da API** | `https://api.deepseek.com` | Endpoint da API EveryWhere |
+| **Caminho customizado do executável** | `""` | Caminho personalizado para o binário `ewh` ou `dsh` caso não esteja no PATH |
 
 ### 🏛️ Estrutura do Código
 

@@ -33,7 +33,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * Gerenciador autônomo do processo DeepSeek Harness (`dsh`) para o Eclipse IDE.
+ * Gerenciador autônomo do processo EveryWhere Harness (`ewh` / `dsh`) para o Eclipse IDE.
  * Fornece ciclo de vida, auto-recuperação (exit code 1), detecção de URL e monitoramento.
  */
 public class DshManager {
@@ -48,7 +48,7 @@ public class DshManager {
     private volatile Integer activePort = null;
     private volatile String lastError = null;
 
-    private static final Pattern URL_DSH_REGEX = Pattern.compile("dsh web:\\s*(https?://\\S+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern URL_DSH_REGEX = Pattern.compile("(?:ewh|dsh) web:\\s*(https?://\\S+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern URL_FALLBACK_REGEX = Pattern.compile("(https?://(?:127\\.0\\.0\\.1|localhost):\\d+[^\\s\"'<>\\)]*)", Pattern.CASE_INSENSITIVE);
 
     private DshManager() {}
@@ -154,9 +154,13 @@ public class DshManager {
             String localAppData = System.getenv("LOCALAPPDATA");
 
             List<File> candidates = Arrays.asList(
+                    new File(appData != null ? appData : "", "npm/ewh.cmd"),
                     new File(appData != null ? appData : "", "npm/dsh.cmd"),
+                    new File(localAppData != null ? localAppData : "", "npm/ewh.cmd"),
                     new File(localAppData != null ? localAppData : "", "npm/dsh.cmd"),
+                    new File(userHome, ".pnpm/ewh.cmd"),
                     new File(userHome, ".pnpm/dsh.cmd"),
+                    new File(userHome, ".local/share/pnpm/ewh.cmd"),
                     new File(userHome, ".local/share/pnpm/dsh.cmd")
             );
 
@@ -166,7 +170,7 @@ public class DshManager {
                 }
             }
 
-            for (String cmd : Arrays.asList("dsh.cmd", "dsh")) {
+            for (String cmd : Arrays.asList("ewh.cmd", "ewh", "dsh.cmd", "dsh")) {
                 try {
                     Process proc = new ProcessBuilder("where.exe", cmd).start();
                     try (BufferedReader r = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
@@ -179,7 +183,7 @@ public class DshManager {
                 } catch (Exception ignored) {}
             }
 
-            return "dsh.cmd";
+            return "ewh.cmd";
         } else {
             // Linux / macOS
             File nvmDir = new File(userHome, ".nvm/versions/node");
@@ -188,15 +192,23 @@ public class DshManager {
                 if (list != null) {
                     Arrays.sort(list, (a, b) -> b.getName().compareTo(a.getName()));
                     for (File v : list) {
-                        File candidate = new File(v, "bin/dsh");
-                        if (candidate.exists()) {
-                            return candidate.getAbsolutePath();
+                        for (String bin : Arrays.asList("ewh", "dsh")) {
+                            File candidate = new File(v, "bin/" + bin);
+                            if (candidate.exists()) {
+                                return candidate.getAbsolutePath();
+                            }
                         }
                     }
                 }
             }
 
             List<String> unixCandidates = Arrays.asList(
+                    "/home/linux/.npm-global/bin/ewh",
+                    userHome + "/.npm-global/bin/ewh",
+                    userHome + "/.local/share/pnpm/ewh",
+                    userHome + "/.local/bin/ewh",
+                    "/usr/local/bin/ewh",
+                    "/usr/bin/ewh",
                     "/home/linux/.npm-global/bin/dsh",
                     userHome + "/.npm-global/bin/dsh",
                     userHome + "/.local/share/pnpm/dsh",
@@ -212,18 +224,20 @@ public class DshManager {
                 }
             }
 
-            try {
-                Process proc = new ProcessBuilder("which", "dsh").start();
-                try (BufferedReader r = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
-                    String line = r.readLine();
-                    if (proc.waitFor(2, TimeUnit.SECONDS) && line != null && !line.trim().isEmpty()) {
-                        File f = new File(line.trim());
-                        if (f.exists()) return f.getAbsolutePath();
+            for (String bin : Arrays.asList("ewh", "dsh")) {
+                try {
+                    Process proc = new ProcessBuilder("which", bin).start();
+                    try (BufferedReader r = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
+                        String line = r.readLine();
+                        if (proc.waitFor(2, TimeUnit.SECONDS) && line != null && !line.trim().isEmpty()) {
+                            File f = new File(line.trim());
+                            if (f.exists()) return f.getAbsolutePath();
+                        }
                     }
-                }
-            } catch (Exception ignored) {}
+                } catch (Exception ignored) {}
+            }
 
-            return "dsh";
+            return "ewh";
         }
     }
 
@@ -239,12 +253,19 @@ public class DshManager {
 
     private static String getSavedSessionFile() {
         String userHome = System.getProperty("user.home", "");
+        File ewhFile = new File(userHome + File.separator + ".ewh" + File.separator + "last-session.json");
+        if (ewhFile.exists()) return ewhFile.getAbsolutePath();
         return userHome + File.separator + ".dsh" + File.separator + "last-session.json";
     }
 
     private static void saveSession(String rawUrl, int port, String token) {
         try {
-            File file = new File(getSavedSessionFile());
+            String userHome = System.getProperty("user.home", "");
+            File ewhDir = new File(userHome + File.separator + ".ewh");
+            File dshDir = new File(userHome + File.separator + ".dsh");
+            File file = (ewhDir.exists() || !dshDir.exists()) 
+                    ? new File(ewhDir, "last-session.json") 
+                    : new File(dshDir, "last-session.json");
             if (file.getParentFile() != null) {
                 file.getParentFile().mkdirs();
             }
@@ -255,14 +276,17 @@ public class DshManager {
 
     private static String loadSavedUrl(int port) {
         try {
-            File file = new File(getSavedSessionFile());
-            if (!file.exists()) return null;
-            String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-            Matcher mPort = Pattern.compile("\"port\"\\s*:\\s*" + port).matcher(content);
-            if (mPort.find()) {
-                Matcher mUrl = Pattern.compile("\"rawUrl\"\\s*:\\s*\"([^\"]+)\"").matcher(content);
-                if (mUrl.find()) {
-                    return mUrl.group(1).trim();
+            String userHome = System.getProperty("user.home", "");
+            for (String subDir : Arrays.asList(".ewh", ".dsh")) {
+                File file = new File(userHome + File.separator + subDir + File.separator + "last-session.json");
+                if (!file.exists()) continue;
+                String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+                Matcher mPort = Pattern.compile("\"port\"\\s*:\\s*" + port).matcher(content);
+                if (mPort.find()) {
+                    Matcher mUrl = Pattern.compile("\"rawUrl\"\\s*:\\s*\"([^\"]+)\"").matcher(content);
+                    if (mUrl.find()) {
+                        return mUrl.group(1).trim();
+                    }
                 }
             }
         } catch (Exception ignored) {}
@@ -291,7 +315,7 @@ public class DshManager {
                             sb.append(line).append("\n");
                         }
                         String body = sb.toString();
-                        if (body.contains("dsh web authentication required") || body.toLowerCase().contains("dsh")) {
+                        if (body.contains("authentication required") || body.toLowerCase().contains("dsh") || body.toLowerCase().contains("ewh")) {
                             return true;
                         }
                     }
@@ -340,7 +364,7 @@ public class DshManager {
         }
 
         setStatus(HarnessStatus.STARTING, null, null, null);
-        EverywhereConsole.log("Iniciando DeepSeek Harness runtime (tentativa " + (isRetry ? "2/recuperação" : "1") + ")...");
+        EverywhereConsole.log("Iniciando EveryWhere Harness runtime (tentativa " + (isRetry ? "2/recuperação" : "1") + ")...");
 
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         final String customDshPath = store.getString(PreferenceConstants.P_CUSTOM_DSH_PATH);
@@ -355,19 +379,18 @@ public class DshManager {
         // Verificar se serviço já está em execução antes de iniciar novo processo
         RunningServiceInfo existing = findRunningDsh(targetPort);
         if (existing != null) {
-            EverywhereConsole.log("[DeepSeek Harness] Serviço já em execução detectado na porta " + existing.port + ". Utilizando instância aberta...");
-            EverywhereConsole.log("[DeepSeek Harness] Backend ready at: " + existing.url);
+            EverywhereConsole.log("[EveryWhere Harness] Serviço já em execução detectado na porta " + existing.port + ". Utilizando instância aberta...");
+            EverywhereConsole.log("[EveryWhere Harness] Backend ready at: " + existing.url);
             setStatus(HarnessStatus.RUNNING, existing.url, existing.port, null);
             return;
         }
-
-        setStatus(HarnessStatus.STARTING, null, null, null);
-        EverywhereConsole.log("Iniciando DeepSeek Harness runtime (tentativa " + (isRetry ? "2/recuperação" : "1") + ")...");
 
         final List<String> cmdList = new ArrayList<>();
         boolean isWindows = System.getProperty("os.name", "").toLowerCase().contains("win");
         if (isWindows && (executable.toLowerCase().endsWith(".cmd") ||
                 executable.toLowerCase().endsWith(".bat") ||
+                "ewh".equalsIgnoreCase(executable) ||
+                "ewh.cmd".equalsIgnoreCase(executable) ||
                 "dsh".equalsIgnoreCase(executable) ||
                 "dsh.cmd".equalsIgnoreCase(executable))) {
             cmdList.add("cmd.exe");
@@ -396,9 +419,11 @@ public class DshManager {
                 // Configurar variáveis de ambiente
                 java.util.Map<String, String> env = pb.environment();
                 if (apiKey != null && !apiKey.trim().isEmpty()) {
+                    env.put("EVERYWHERE_API_KEY", apiKey.trim());
                     env.put("DEEPSEEK_API_KEY", apiKey.trim());
                 }
                 if (baseUrl != null && !baseUrl.trim().isEmpty()) {
+                    env.put("EVERYWHERE_BASE_URL", baseUrl.trim());
                     env.put("DEEPSEEK_BASE_URL", baseUrl.trim());
                 }
 
@@ -461,7 +486,7 @@ public class DshManager {
                                     } catch (Exception ignored) {}
 
                                     saveSession(detected, detectedPort, token);
-                                    EverywhereConsole.log("[DeepSeek Harness] Backend ready at: " + detected);
+                                    EverywhereConsole.log("[EveryWhere Harness] Backend ready at: " + detected);
                                     setStatus(HarnessStatus.RUNNING, detected, detectedPort, null);
                                 }
                             }
@@ -511,7 +536,7 @@ public class DshManager {
                                         String saved = loadSavedUrl(p);
                                         String healthUrl = (saved != null && !saved.isEmpty()) ? saved : ("http://127.0.0.1:" + p + "/");
                                         EverywhereConsole.log("Health check ativo detectou serviço respondendo na porta " + p + " (HTTP " + code + ")");
-                                        EverywhereConsole.log("[DeepSeek Harness] Backend ready at: " + healthUrl);
+                                        EverywhereConsole.log("[EveryWhere Harness] Backend ready at: " + healthUrl);
                                         setStatus(HarnessStatus.RUNNING, healthUrl, p, null);
                                         break;
                                     }
@@ -529,7 +554,7 @@ public class DshManager {
                         Thread.sleep(30000);
                     } catch (InterruptedException ignored) {}
                     if (!urlFound.get() && status == HarnessStatus.STARTING && process.isAlive()) {
-                        String errMsg = "Tempo limite excedido (30s) aguardando o DeepSeek Harness responder.";
+                        String errMsg = "Tempo limite excedido (30s) aguardando o EveryWhere Harness responder.";
                         EverywhereConsole.error(errMsg);
                         setStatus(HarnessStatus.ERROR, null, null, errMsg);
                     }
@@ -538,14 +563,14 @@ public class DshManager {
                 watchdogThread.start();
 
                 int exitCode = process.waitFor();
-                EverywhereConsole.log("Processo DeepSeek Harness finalizado com código " + exitCode + ".");
+                EverywhereConsole.log("Processo EveryWhere Harness finalizado com código " + exitCode + ".");
 
                 if (!urlFound.get()) {
                     if (exitCode == 1) {
                         RunningServiceInfo running = findRunningDsh(targetPort);
                         if (running != null) {
-                            EverywhereConsole.log("[DeepSeek Harness] Processo encerrou com código 1 pois DeepSeek Harness já está em execução na porta " + running.port + ". Utilizando instância aberta...");
-                            EverywhereConsole.log("[DeepSeek Harness] Backend ready at: " + running.url);
+                            EverywhereConsole.log("[EveryWhere Harness] Processo encerrou com código 1 pois EveryWhere Harness já está em execução na porta " + running.port + ". Utilizando instância aberta...");
+                            EverywhereConsole.log("[EveryWhere Harness] Backend ready at: " + running.url);
                             setStatus(HarnessStatus.RUNNING, running.url, running.port, null);
                             return;
                         }
@@ -561,14 +586,14 @@ public class DshManager {
                         }
                     }
 
-                    String errMsg = "DeepSeek Harness encerrou prematuramente com código " + exitCode + ".";
+                    String errMsg = "EveryWhere Harness encerrou prematuramente com código " + exitCode + ".";
                     setStatus(HarnessStatus.ERROR, null, null, errMsg);
                 } else {
                     setStatus(HarnessStatus.STOPPED, null, null, null);
                 }
 
             } catch (Exception e) {
-                String errMsg = "Erro ao executar DeepSeek Harness: " + e.getMessage();
+                String errMsg = "Erro ao executar EveryWhere Harness: " + e.getMessage();
                 EverywhereConsole.error(errMsg);
                 setStatus(HarnessStatus.ERROR, null, null, errMsg);
             }
@@ -584,7 +609,7 @@ public class DshManager {
 
     public synchronized void stop(boolean silent) {
         if (!silent) {
-            EverywhereConsole.log("Interrompendo DeepSeek Harness e limpando processos...");
+            EverywhereConsole.log("Interrompendo EveryWhere Harness e limpando processos...");
         }
 
         if (currentProcess != null) {
@@ -597,11 +622,11 @@ public class DshManager {
             currentProcess = null;
         }
 
-        killOrphanProcesses();
+        killOrphanProcesses() ;
         setStatus(HarnessStatus.STOPPED, null, null, null);
 
         if (!silent) {
-            EverywhereConsole.log("DeepSeek Harness interrompido com sucesso.");
+            EverywhereConsole.log("EveryWhere Harness interrompido com sucesso.");
         }
     }
 
@@ -617,10 +642,12 @@ public class DshManager {
         try {
             boolean isWindows = System.getProperty("os.name", "").toLowerCase().contains("win");
             if (isWindows) {
-                try {
-                    Process p = new ProcessBuilder("taskkill.exe", "/F", "/IM", "dsh.exe", "/T").start();
-                    p.waitFor(2, TimeUnit.SECONDS);
-                } catch (Exception ignored) {}
+                for (String proc : Arrays.asList("ewh.exe", "dsh.exe")) {
+                    try {
+                        Process p = new ProcessBuilder("taskkill.exe", "/F", "/IM", proc, "/T").start();
+                        p.waitFor(2, TimeUnit.SECONDS);
+                    } catch (Exception ignored) {}
+                }
 
                 List<Integer> ports = new ArrayList<>();
                 if (activePort != null) ports.add(activePort);
@@ -630,10 +657,12 @@ public class DshManager {
                     killWindowsPort(port);
                 }
             } else {
-                try {
-                    Process p = new ProcessBuilder("pkill", "-f", "dsh").start();
-                    p.waitFor(2, TimeUnit.SECONDS);
-                } catch (Exception ignored) {}
+                for (String proc : Arrays.asList("ewh", "dsh")) {
+                    try {
+                        Process p = new ProcessBuilder("pkill", "-f", proc).start();
+                        p.waitFor(2, TimeUnit.SECONDS);
+                    } catch (Exception ignored) {}
+                }
 
                 List<Integer> ports = new ArrayList<>();
                 if (activePort != null) ports.add(activePort);

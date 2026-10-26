@@ -1,5 +1,5 @@
 /**
- * Status of the DeepSeek Harness runtime process.
+ * Status of the EveryWhere Harness runtime process.
  */
 export type HarnessStatus =
   | 'stopped'
@@ -10,7 +10,7 @@ export type HarnessStatus =
   | 'installing'
 
 /**
- * Information about the currently running DeepSeek Harness instance.
+ * Information about the currently running EveryWhere Harness instance.
  */
 export interface HarnessInfo {
   status: HarnessStatus

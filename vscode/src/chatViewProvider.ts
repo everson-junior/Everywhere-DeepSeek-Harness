@@ -229,9 +229,9 @@ function getHtmlForStatus(info: HarnessInfo): string {
 </head>
 <body>
   <div class="card">
-    <h2>Instalando DeepSeek Harness...</h2>
+    <h2>Instalando EveryWhere Harness...</h2>
     <div class="spinner"></div>
-    <p>Executando o setup de <code>@deepseek-ai/dsh</code> no background. Acompanhe os detalhes no terminal de saída.</p>
+    <p>Executando o setup do EveryWhere Harness no background. Acompanhe os detalhes no terminal de saída.</p>
     <button class="btn secondary" id="btn-logs">📋 Ver Logs da Instalação</button>
   </div>
   <script nonce="${nonce}">
@@ -256,11 +256,11 @@ function getHtmlForStatus(info: HarnessInfo): string {
 <body>
   <div class="card">
     <div class="install-icon">⚡</div>
-    <h2>DeepSeek Harness Não Encontrado</h2>
-    <p>O comando <code>dsh</code> não está instalado no seu sistema. Escolha como deseja instalar:</p>
+    <h2>EveryWhere Harness Não Encontrado</h2>
+    <p>O comando <code>ewh</code> (ou <code>dsh</code>) não está instalado no seu sistema. Escolha como deseja instalar:</p>
 
     <button class="btn primary" id="btn-auto-install">
-      ⚡ Instalar DeepSeek Harness Automaticamente
+      ⚡ Instalar EveryWhere Harness Automaticamente
     </button>
     <div class="note" style="text-align:center; font-size:10px;">
       Instalação limpa e transparente no background
@@ -269,7 +269,7 @@ function getHtmlForStatus(info: HarnessInfo): string {
     <div class="divider">OU INSTALAR MANUALMENTE NO TERMINAL</div>
 
     <div class="cmd-box">
-      <span class="cmd-text" id="cmd-to-copy">npm install -g @deepseek-ai/dsh</span>
+      <span class="cmd-text" id="cmd-to-copy">npm install -g @everywhere-harness/ewh</span>
       <button class="copy-btn" id="btn-copy" title="Copiar comando">
         <span id="copy-label">Copiar</span>
       </button>
@@ -293,7 +293,7 @@ function getHtmlForStatus(info: HarnessInfo): string {
     });
 
     document.getElementById('btn-copy').addEventListener('click', () => {
-      const text = 'npm install -g @deepseek-ai/dsh';
+      const text = 'npm install -g @everywhere-harness/ewh';
       vscode.postMessage({ command: 'copy', text: text });
       const copyBtn = document.getElementById('btn-copy');
       const copyLabel = document.getElementById('copy-label');
@@ -332,7 +332,7 @@ function getHtmlForStatus(info: HarnessInfo): string {
 </head>
 <body>
   <div class="card">
-    <h2>Starting DeepSeek Harness...</h2>
+    <h2>Starting EveryWhere Harness...</h2>
     <div class="spinner"></div>
     <p>Authenticating and loading workspace chat...</p>
     <button class="btn secondary" id="btn-logs">View Logs</button>
@@ -391,9 +391,9 @@ function getHtmlForStatus(info: HarnessInfo): string {
 </head>
 <body>
   <div class="card">
-    <h2>DeepSeek Harness</h2>
+    <h2>EveryWhere Harness</h2>
     <p>Autonomous AI agent running directly in your sidebar.</p>
-    <button class="btn primary" id="btn-start">▶ Start DeepSeek Harness</button>
+    <button class="btn primary" id="btn-start">▶ Start EveryWhere Harness</button>
     <button class="btn secondary" id="btn-open-editor">📑 Open in Editor Tab</button>
     <button class="btn secondary" id="btn-logs">📋 View Logs</button>
   </div>
@@ -423,10 +423,10 @@ function getNonce(): string {
 }
 
 /**
- * Webview View Provider for embedding DeepSeek Harness in the sidebar.
+ * Webview View Provider for embedding EveryWhere Harness in the sidebar.
  */
-export class DeepSeekHarnessViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'deepseek.harnessView'
+export class EveryWhereHarnessViewProvider implements vscode.WebviewViewProvider {
+  public static readonly viewType = 'everywhere.harnessView'
   private view?: vscode.WebviewView
 
   constructor(
@@ -459,13 +459,13 @@ export class DeepSeekHarnessViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.onDidReceiveMessage(async (data: { command: string; text?: string }) => {
       switch (data.command) {
         case 'start':
-          await vscode.commands.executeCommand('deepseek.startHarness')
+          await vscode.commands.executeCommand('everywhere.startHarness')
           break
         case 'install':
-          await vscode.commands.executeCommand('deepseek.installHarness')
+          await vscode.commands.executeCommand('everywhere.installHarness')
           break
         case 'checkAvailable':
-          await vscode.commands.executeCommand('deepseek.checkHarness')
+          await vscode.commands.executeCommand('everywhere.checkHarness')
           break
         case 'copy':
           if (data.text) {
@@ -474,22 +474,22 @@ export class DeepSeekHarnessViewProvider implements vscode.WebviewViewProvider {
           }
           break
         case 'restart':
-          await vscode.commands.executeCommand('deepseek.restartHarness')
+          await vscode.commands.executeCommand('everywhere.restartHarness')
           break
         case 'stop':
-          await vscode.commands.executeCommand('deepseek.stopHarness')
+          await vscode.commands.executeCommand('everywhere.stopHarness')
           break
         case 'openEditorTab':
-          await vscode.commands.executeCommand('deepseek.openFullView')
+          await vscode.commands.executeCommand('everywhere.openFullView')
           break
         case 'openSettings':
-          vscode.commands.executeCommand('deepseek.openSettings')
+          vscode.commands.executeCommand('everywhere.openSettings')
           break
         case 'openExternal':
           if (data.text) await vscode.env.openExternal(vscode.Uri.parse(data.text))
           break
         case 'showLogs':
-          vscode.commands.executeCommand('deepseek.showLogs')
+          vscode.commands.executeCommand('everywhere.showLogs')
           break
       }
     })
@@ -498,7 +498,7 @@ export class DeepSeekHarnessViewProvider implements vscode.WebviewViewProvider {
       this.updateWebviewContent(this.dshManager.info)
       if (this.config.autoStart && this.dshManager.info.status === 'stopped') {
         this.dshManager.start().catch((err: Error) => {
-          vscode.window.showErrorMessage(`DeepSeek Harness: ${err.message}`)
+          vscode.window.showErrorMessage(`EveryWhere Harness: ${err.message}`)
         })
       }
     })
@@ -512,15 +512,15 @@ export class DeepSeekHarnessViewProvider implements vscode.WebviewViewProvider {
 }
 
 /**
- * Opens DeepSeek Harness inside a dedicated VS Code Editor Tab.
+ * Opens EveryWhere Harness inside a dedicated VS Code Editor Tab.
  */
 export function openHarnessInEditorTab(
   context: vscode.ExtensionContext,
   dshManager: DshProcessManager,
 ): vscode.WebviewPanel {
   const panel = vscode.window.createWebviewPanel(
-    'deepseekHarnessEditorTab',
-    'DeepSeek Harness',
+    'everywhereHarnessEditorTab',
+    'EveryWhere Harness',
     vscode.ViewColumn.Active,
     {
       enableScripts: true,
@@ -537,19 +537,19 @@ export function openHarnessInEditorTab(
   panel.webview.onDidReceiveMessage(async (data: { command: string; text?: string }) => {
     switch (data.command) {
       case 'start':
-        await vscode.commands.executeCommand('deepseek.startHarness')
+        await vscode.commands.executeCommand('everywhere.startHarness')
         break
       case 'stop':
-        await vscode.commands.executeCommand('deepseek.stopHarness')
+        await vscode.commands.executeCommand('everywhere.stopHarness')
         break
       case 'restart':
-        await vscode.commands.executeCommand('deepseek.restartHarness')
+        await vscode.commands.executeCommand('everywhere.restartHarness')
         break
       case 'install':
-        await vscode.commands.executeCommand('deepseek.installHarness')
+        await vscode.commands.executeCommand('everywhere.installHarness')
         break
       case 'checkAvailable':
-        await vscode.commands.executeCommand('deepseek.checkHarness')
+        await vscode.commands.executeCommand('everywhere.checkHarness')
         break
       case 'copy':
         if (data.text) {
@@ -558,13 +558,13 @@ export function openHarnessInEditorTab(
         }
         break
       case 'openSettings':
-        vscode.commands.executeCommand('deepseek.openSettings')
+        vscode.commands.executeCommand('everywhere.openSettings')
         break
       case 'openExternal':
         if (data.text) await vscode.env.openExternal(vscode.Uri.parse(data.text))
         break
       case 'showLogs':
-        vscode.commands.executeCommand('deepseek.showLogs')
+        vscode.commands.executeCommand('everywhere.showLogs')
         break
     }
   })
@@ -576,7 +576,7 @@ export function openHarnessInEditorTab(
 
   if (dshManager.info.status === 'stopped') {
     dshManager.start().catch((err: Error) => {
-      vscode.window.showErrorMessage(`DeepSeek Harness: ${err.message}`)
+      vscode.window.showErrorMessage(`EveryWhere Harness: ${err.message}`)
     })
   }
 

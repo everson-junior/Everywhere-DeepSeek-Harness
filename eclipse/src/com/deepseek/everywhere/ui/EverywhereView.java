@@ -30,7 +30,7 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * Visualização principal do Everywhere no Eclipse IDE.
- * Incorpora o navegador nativo SWT para exibir o DeepSeek Harness e painel de controle.
+ * Incorpora o navegador nativo SWT para exibir o EveryWhere Harness e painel de controle.
  */
 public class EverywhereView extends ViewPart implements HarnessStatusListener {
 
@@ -112,7 +112,7 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
         title.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
 
         Label subtitle = new Label(overlayComposite, SWT.CENTER);
-        subtitle.setText("DeepSeek Harness Autonomous AI Agent");
+        subtitle.setText("EveryWhere Harness Autonomous AI Agent");
         subtitle.setFont(subtitleFont);
         subtitle.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         subtitle.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
@@ -149,7 +149,7 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
         btnComposite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
 
         startButton = new Button(btnComposite, SWT.PUSH);
-        startButton.setText("▶ Iniciar DeepSeek Harness");
+        startButton.setText("▶ Iniciar EveryWhere Harness");
         startButton.setFont(boldFont);
         GridData sbGd = new GridData(SWT.FILL, SWT.CENTER, true, false);
         sbGd.widthHint = 260;
@@ -238,7 +238,7 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
             if (statusLabel != null && !statusLabel.isDisposed()) {
                 switch (status) {
                     case STARTING:
-                        statusLabel.setText("⏳ Status: Iniciando serviço DeepSeek...");
+                        statusLabel.setText("⏳ Status: Iniciando serviço EveryWhere...");
                         statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
                         if (errorLabel != null) errorLabel.setVisible(false);
                         break;

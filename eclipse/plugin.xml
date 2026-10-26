@@ -10,7 +10,7 @@
       </category>
       <view
             id="com.deepseek.everywhere.ui.EverywhereView"
-            name="Everywhere DeepSeek Harness"
+            name="EveryWhere Harness"
             icon="icons/deepseek_16.png"
             category="com.deepseek.everywhere.category"
             class="com.deepseek.everywhere.ui.EverywhereView"
@@ -26,25 +26,25 @@
       </category>
       <command
             id="com.deepseek.everywhere.commands.openView"
-            name="Abrir Everywhere DeepSeek Harness"
+            name="Abrir EveryWhere Harness"
             categoryId="com.deepseek.everywhere.commands.category"
             defaultHandler="com.deepseek.everywhere.handlers.OpenEverywhereViewHandler">
       </command>
       <command
             id="com.deepseek.everywhere.commands.start"
-            name="Iniciar DeepSeek Harness"
+            name="Iniciar EveryWhere Harness"
             categoryId="com.deepseek.everywhere.commands.category"
             defaultHandler="com.deepseek.everywhere.handlers.StartHarnessHandler">
       </command>
       <command
             id="com.deepseek.everywhere.commands.stop"
-            name="Parar DeepSeek Harness"
+            name="Parar EveryWhere Harness"
             categoryId="com.deepseek.everywhere.commands.category"
             defaultHandler="com.deepseek.everywhere.handlers.StopHarnessHandler">
       </command>
       <command
             id="com.deepseek.everywhere.commands.restart"
-            name="Reiniciar DeepSeek Harness"
+            name="Reiniciar EveryWhere Harness"
             categoryId="com.deepseek.everywhere.commands.category"
             defaultHandler="com.deepseek.everywhere.handlers.RestartHarnessHandler">
       </command>
@@ -68,17 +68,17 @@
             <command
                   commandId="com.deepseek.everywhere.commands.start"
                   icon="icons/start.png"
-                  label="Iniciar DeepSeek Harness">
+                  label="Iniciar EveryWhere Harness">
             </command>
             <command
                   commandId="com.deepseek.everywhere.commands.stop"
                   icon="icons/stop.png"
-                  label="Parar DeepSeek Harness">
+                  label="Parar EveryWhere Harness">
             </command>
             <command
                   commandId="com.deepseek.everywhere.commands.restart"
                   icon="icons/restart.png"
-                  label="Reiniciar DeepSeek Harness">
+                  label="Reiniciar EveryWhere Harness">
             </command>
          </menu>
       </menuContribution>
@@ -89,7 +89,7 @@
             <command
                   commandId="com.deepseek.everywhere.commands.openView"
                   icon="icons/deepseek_16.png"
-                  tooltip="Abrir Everywhere DeepSeek Harness">
+                  tooltip="Abrir EveryWhere Harness">
             </command>
          </toolbar>
       </menuContribution>
@@ -99,7 +99,7 @@
    <extension point="org.eclipse.ui.preferencePages">
       <page
             id="com.deepseek.everywhere.preferences.page"
-            name="Everywhere DeepSeek Harness"
+            name="EveryWhere Harness"
             class="com.deepseek.everywhere.preferences.EverywherePreferencePage">
       </page>
    </extension>

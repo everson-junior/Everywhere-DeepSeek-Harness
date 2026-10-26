@@ -12,11 +12,11 @@ import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
 /**
- * Canal de console integrado para o Everywhere (DeepSeek Harness) no Eclipse.
+ * Canal de console integrado para o EveryWhere Harness no Eclipse.
  */
 public class EverywhereConsole {
 
-    private static final String CONSOLE_NAME = "Everywhere DeepSeek Harness";
+    private static final String CONSOLE_NAME = "EveryWhere Harness";
     private static MessageConsole console;
     private static MessageConsoleStream infoStream;
     private static MessageConsoleStream errStream;

@@ -97,9 +97,13 @@ class DshManagerService(private val project: Project) {
             val localAppData = System.getenv("LOCALAPPDATA") ?: ""
 
             val candidates = listOf(
+                File(appData, "npm/ewh.cmd").absolutePath,
                 File(appData, "npm/dsh.cmd").absolutePath,
+                File(localAppData, "npm/ewh.cmd").absolutePath,
                 File(localAppData, "npm/dsh.cmd").absolutePath,
+                File(userHome, ".pnpm/ewh.cmd").absolutePath,
                 File(userHome, ".pnpm/dsh.cmd").absolutePath,
+                File(userHome, ".local/share/pnpm/ewh.cmd").absolutePath,
                 File(userHome, ".local/share/pnpm/dsh.cmd").absolutePath
             )
 
@@ -109,7 +113,7 @@ class DshManagerService(private val project: Project) {
                 }
             }
 
-            for (cmdCandidate in listOf("dsh.cmd", "dsh")) {
+            for (cmdCandidate in listOf("ewh.cmd", "ewh", "dsh.cmd", "dsh")) {
                 try {
                     val whereProc = ProcessBuilder("where.exe", cmdCandidate).start()
                     val reader = BufferedReader(InputStreamReader(whereProc.inputStream))
@@ -121,7 +125,7 @@ class DshManagerService(private val project: Project) {
                 } catch (_: Exception) {}
             }
 
-            return "dsh.cmd"
+            return "ewh.cmd"
         } else {
             val nvmDir = File(userHome, ".nvm/versions/node")
             if (nvmDir.exists() && nvmDir.isDirectory) {
@@ -129,15 +133,22 @@ class DshManagerService(private val project: Project) {
                     ?.sortedWith(compareByDescending { it.name })
                 if (versions != null) {
                     for (ver in versions) {
-                        val candidate = File(ver, "bin/dsh")
-                        if (candidate.exists()) {
-                            return candidate.absolutePath
+                        for (binName in listOf("ewh", "dsh")) {
+                            val candidate = File(ver, "bin/$binName")
+                            if (candidate.exists()) {
+                                return candidate.absolutePath
+                            }
                         }
                     }
                 }
             }
 
             val unixCandidates = listOf(
+                "/usr/local/bin/ewh",
+                "/usr/bin/ewh",
+                File(userHome, ".local/share/pnpm/ewh").absolutePath,
+                File(userHome, ".local/bin/ewh").absolutePath,
+                File(userHome, ".npm-global/bin/ewh").absolutePath,
                 "/usr/local/bin/dsh",
                 "/usr/bin/dsh",
                 File(userHome, ".local/share/pnpm/dsh").absolutePath,
@@ -151,12 +162,12 @@ class DshManagerService(private val project: Project) {
                 }
             }
 
-            return "dsh"
+            return "ewh"
         }
     }
 
     private fun extractUrlFromLine(text: String): String? {
-        val dshRegex = Pattern.compile("dsh web:\\s*(https?://\\S+)", Pattern.CASE_INSENSITIVE)
+        val dshRegex = Pattern.compile("(?:ewh|dsh) web:\\s*(https?://\\S+)", Pattern.CASE_INSENSITIVE)
         val dshMatcher = dshRegex.matcher(text)
         if (dshMatcher.find()) {
             return dshMatcher.group(1).trim()
@@ -180,15 +191,15 @@ class DshManagerService(private val project: Project) {
         val settings = EverywhereSettingsState.instance
         val existing = findRunningDsh(settings.port)
         if (existing != null) {
-            appendLog("[DeepSeek Harness] Serviço já em execução detectado na porta ${existing.first}. Utilizando instância aberta...")
-            appendLog("[DeepSeek Harness] Backend ready at: ${existing.second}")
+            appendLog("[EveryWhere Harness] Serviço já em execução detectado na porta ${existing.first}. Utilizando instância aberta...")
+            appendLog("[EveryWhere Harness] Backend ready at: ${existing.second}")
             setStatus(HarnessStatus.RUNNING, url = existing.second, port = existing.first)
             notifySuccess(existing.second)
             return
         }
 
         setStatus(HarnessStatus.STARTING)
-        appendLog("Iniciando DeepSeek Harness runtime...")
+        appendLog("Iniciando EveryWhere Harness runtime...")
 
         val executable = findDshExecutable(settings.customDshPath)
         val workingDir = resolveWorkspaceDirectory()
@@ -197,6 +208,8 @@ class DshManagerService(private val project: Project) {
         val cmdList = mutableListOf<String>()
         if (SystemInfo.isWindows && (executable.lowercase().endsWith(".cmd") ||
                     executable.lowercase().endsWith(".bat") ||
+                    executable.equals("ewh", ignoreCase = true) ||
+                    executable.equals("ewh.cmd", ignoreCase = true) ||
                     executable.equals("dsh", ignoreCase = true) ||
                     executable.equals("dsh.cmd", ignoreCase = true))) {
             cmdList.add("cmd.exe")
@@ -220,9 +233,11 @@ class DshManagerService(private val project: Project) {
 
                 val env = processBuilder.environment()
                 if (settings.apiKey.isNotBlank()) {
+                    env["EVERYWHERE_API_KEY"] = settings.apiKey
                     env["DEEPSEEK_API_KEY"] = settings.apiKey
                 }
                 if (settings.baseUrl.isNotBlank()) {
+                    env["EVERYWHERE_BASE_URL"] = settings.baseUrl
                     env["DEEPSEEK_BASE_URL"] = settings.baseUrl
                 }
 
@@ -279,7 +294,7 @@ class DshManagerService(private val project: Project) {
                                     } catch (_: Exception) {}
 
                                     saveSession(detected, detectedPort, token)
-                                    appendLog("[DeepSeek Harness] Backend ready at: $detected")
+                                    appendLog("[EveryWhere Harness] Backend ready at: $detected")
                                     setStatus(HarnessStatus.RUNNING, url = detected, port = detectedPort)
                                     notifySuccess(detected)
                                 }
@@ -323,7 +338,7 @@ class DshManagerService(private val project: Project) {
                                         val saved = loadSavedUrl(port)
                                         val healthUrl = if (!saved.isNullOrBlank()) saved else "http://127.0.0.1:$port/"
                                         appendLog("Health check ativo detectou serviço respondendo na porta $port (HTTP $code)")
-                                        appendLog("[DeepSeek Harness] Backend ready at: $healthUrl")
+                                        appendLog("[EveryWhere Harness] Backend ready at: $healthUrl")
                                         setStatus(HarnessStatus.RUNNING, url = healthUrl, port = port)
                                         notifySuccess(healthUrl)
                                         break
@@ -340,7 +355,7 @@ class DshManagerService(private val project: Project) {
                 val timeoutWatchdog = Thread {
                     Thread.sleep(30000)
                     if (!urlFound.get() && status == HarnessStatus.STARTING && process.isAlive) {
-                        val errMsg = "Tempo limite excedido (30s) aguardando o DeepSeek Harness responder. Verifique se o executável 'dsh' funciona no terminal."
+                        val errMsg = "Tempo limite excedido (30s) aguardando o EveryWhere Harness responder. Verifique se o executável 'ewh' ou 'dsh' funciona no terminal."
                         appendLog(errMsg)
                         setStatus(HarnessStatus.ERROR, error = errMsg)
                         notifyError(errMsg)
@@ -350,14 +365,14 @@ class DshManagerService(private val project: Project) {
                 timeoutWatchdog.start()
 
                 val exitCode = process.waitFor()
-                appendLog("Processo DeepSeek Harness finalizado com código $exitCode.")
+                appendLog("Processo EveryWhere Harness finalizado com código $exitCode.")
 
                 if (!urlFound.get()) {
                     if (exitCode == 1) {
                         val running = findRunningDsh(settings.port)
                         if (running != null) {
-                            appendLog("[DeepSeek Harness] Processo encerrou com código 1 pois DeepSeek Harness já está em execução na porta ${running.first}. Utilizando instância aberta...")
-                            appendLog("[DeepSeek Harness] Backend ready at: ${running.second}")
+                            appendLog("[EveryWhere Harness] Processo encerrou com código 1 pois EveryWhere Harness já está em execução na porta ${running.first}. Utilizando instância aberta...")
+                            appendLog("[EveryWhere Harness] Backend ready at: ${running.second}")
                             setStatus(HarnessStatus.RUNNING, url = running.second, port = running.first)
                             notifySuccess(running.second)
                             return@Thread
@@ -372,14 +387,14 @@ class DshManagerService(private val project: Project) {
                         }
                     }
 
-                    val errMsg = "DeepSeek Harness encerrou prematuramente com código $exitCode."
+                    val errMsg = "EveryWhere Harness encerrou prematuramente com código $exitCode."
                     setStatus(HarnessStatus.ERROR, error = errMsg)
                     notifyError(errMsg)
                 } else {
                     setStatus(HarnessStatus.STOPPED)
                 }
             } catch (ex: Exception) {
-                val errMsg = "Erro ao executar DeepSeek Harness: ${ex.message}"
+                val errMsg = "Erro ao executar EveryWhere Harness: ${ex.message}"
                 appendLog(errMsg)
                 setStatus(HarnessStatus.ERROR, error = errMsg)
                 notifyError(errMsg)
@@ -390,7 +405,7 @@ class DshManagerService(private val project: Project) {
     @Synchronized
     fun stop(silent: Boolean = false) {
         if (!silent) {
-            appendLog("Interrompendo DeepSeek Harness e limpando processos órfãos...")
+            appendLog("Interrompendo EveryWhere Harness e limpando processos órfãos...")
         }
 
         currentProcess?.let { proc ->
@@ -407,7 +422,7 @@ class DshManagerService(private val project: Project) {
         killOrphanProcesses()
         setStatus(HarnessStatus.STOPPED)
         if (!silent) {
-            appendLog("DeepSeek Harness interrompido com sucesso.")
+            appendLog("EveryWhere Harness interrompido com sucesso.")
         }
     }
 
@@ -420,20 +435,24 @@ class DshManagerService(private val project: Project) {
     private fun killOrphanProcesses() {
         try {
             if (SystemInfo.isWindows) {
-                try {
-                    val p = ProcessBuilder("taskkill.exe", "/F", "/IM", "dsh.exe", "/T").start()
-                    p.waitFor(2, TimeUnit.SECONDS)
-                } catch (_: Exception) {}
+                for (procName in listOf("ewh.exe", "dsh.exe")) {
+                    try {
+                        val p = ProcessBuilder("taskkill.exe", "/F", "/IM", procName, "/T").start()
+                        p.waitFor(2, TimeUnit.SECONDS)
+                    } catch (_: Exception) {}
+                }
 
                 val targetPorts = listOfNotNull(activePort, 3080, 3000).distinct()
                 for (port in targetPorts) {
                     killWindowsPort(port)
                 }
             } else {
-                try {
-                    val p = ProcessBuilder("pkill", "-f", "dsh").start()
-                    p.waitFor(2, TimeUnit.SECONDS)
-                } catch (_: Exception) {}
+                for (procName in listOf("ewh", "dsh")) {
+                    try {
+                        val p = ProcessBuilder("pkill", "-f", procName).start()
+                        p.waitFor(2, TimeUnit.SECONDS)
+                    } catch (_: Exception) {}
+                }
 
                 val targetPorts = listOfNotNull(activePort, 3080, 3000).distinct()
                 for (port in targetPorts) {
@@ -470,7 +489,7 @@ class DshManagerService(private val project: Project) {
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Everywhere Notification Group")
                 ?.createNotification(
-                    "DeepSeek Harness Ativo",
+                    "EveryWhere Harness Ativo",
                     "Serviço em execução em $url",
                     NotificationType.INFORMATION
                 )
@@ -483,7 +502,7 @@ class DshManagerService(private val project: Project) {
             NotificationGroupManager.getInstance()
                 .getNotificationGroup("Everywhere Notification Group")
                 ?.createNotification(
-                    "Erro no DeepSeek Harness",
+                    "Erro no EveryWhere Harness",
                     message,
                     NotificationType.ERROR
                 )
@@ -497,13 +516,18 @@ class DshManagerService(private val project: Project) {
 
         fun getSavedSessionFile(): File {
             val userHome = System.getProperty("user.home", "")
+            val ewhFile = File(userHome, ".ewh/last-session.json")
+            if (ewhFile.exists()) return ewhFile
             return File(userHome, ".dsh/last-session.json")
         }
 
         fun saveSession(rawUrl: String, port: Int, token: String?) {
             try {
-                val file = getSavedSessionFile()
-                file.parentFile?.mkdirs()
+                val userHome = System.getProperty("user.home", "")
+                val ewhDir = File(userHome, ".ewh")
+                val dshDir = File(userHome, ".dsh")
+                val targetFile = if (ewhDir.exists() || !dshDir.exists()) File(ewhDir, "last-session.json") else File(dshDir, "last-session.json")
+                targetFile.parentFile?.mkdirs()
                 val json = """
                     {
                       "rawUrl": "$rawUrl",
@@ -512,20 +536,23 @@ class DshManagerService(private val project: Project) {
                       "updatedAt": ${System.currentTimeMillis()}
                     }
                 """.trimIndent()
-                file.writeText(json, Charsets.UTF_8)
+                targetFile.writeText(json, Charsets.UTF_8)
             } catch (_: Exception) {}
         }
 
         fun loadSavedUrl(port: Int): String? {
             try {
-                val file = getSavedSessionFile()
-                if (!file.exists()) return null
-                val content = file.readText(Charsets.UTF_8)
-                val mPort = Pattern.compile("\"port\"\\s*:\\s*$port").matcher(content)
-                if (mPort.find()) {
-                    val mUrl = Pattern.compile("\"rawUrl\"\\s*:\\s*\"([^\"]+)\"").matcher(content)
-                    if (mUrl.find()) {
-                        return mUrl.group(1).trim()
+                val userHome = System.getProperty("user.home", "")
+                for (subDir in listOf(".ewh", ".dsh")) {
+                    val file = File(userHome, "$subDir/last-session.json")
+                    if (!file.exists()) continue
+                    val content = file.readText(Charsets.UTF_8)
+                    val mPort = Pattern.compile("\"port\"\\s*:\\s*$port").matcher(content)
+                    if (mPort.find()) {
+                        val mUrl = Pattern.compile("\"rawUrl\"\\s*:\\s*\"([^\"]+)\"").matcher(content)
+                        if (mUrl.find()) {
+                            return mUrl.group(1).trim()
+                        }
                     }
                 }
             } catch (_: Exception) {}
@@ -548,7 +575,7 @@ class DshManagerService(private val project: Project) {
                     val stream = conn.errorStream ?: conn.inputStream
                     if (stream != null) {
                         val body = stream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-                        if (body.contains("dsh web authentication required") || body.lowercase().contains("dsh")) {
+                        if (body.contains("authentication required") || body.lowercase().contains("dsh") || body.lowercase().contains("ewh")) {
                             return true
                         }
                     }

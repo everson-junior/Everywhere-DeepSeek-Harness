@@ -15,13 +15,13 @@
       <Button guid="guidEverywherePackageCmdSet" id="cmdidEverywhereToolWindowCommand" priority="0x0100" type="Button">
         <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
         <Strings>
-          <ButtonText>Everywhere (DeepSeek Harness)</ButtonText>
+          <ButtonText>EveryWhere Harness</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidEverywherePackageCmdSet" id="cmdidEverywhereToolsMenuCommand" priority="0x0100" type="Button">
         <Parent guid="guidEverywherePackageCmdSet" id="EverywhereMenuGroup"/>
         <Strings>
-          <ButtonText>Everywhere (DeepSeek Harness)</ButtonText>
+          <ButtonText>EveryWhere Harness</ButtonText>
         </Strings>
       </Button>
     </Buttons>

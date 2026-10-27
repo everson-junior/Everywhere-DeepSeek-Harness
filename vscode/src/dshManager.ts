@@ -444,7 +444,23 @@ export function resolveHarnessCommand(
     }
   }
 
-  // 4. Fallback to global `ewh` or `dsh` CLI command
+  // 4. Check directories in enhanced PATH for installed ewh or dsh binary
+  const env = resolveEnhancedEnv(config)
+  const pathSep = isWin ? ';' : ':'
+  const dirs = (env.PATH ?? '').split(pathSep).filter(Boolean)
+  for (const binName of candidateBinNames) {
+    for (const dir of dirs) {
+      const candidatePath = join(dir, binName)
+      if (existsSync(candidatePath)) {
+        return {
+          command: candidatePath,
+          args: profileArgs,
+        }
+      }
+    }
+  }
+
+  // 5. Fallback to global `ewh` CLI command if neither binary was explicitly located
   return {
     command: isWin ? 'ewh.cmd' : 'ewh',
     args: profileArgs,

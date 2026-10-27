@@ -19,5 +19,6 @@
         ".claude/instructions": true,
         ".claude/rules": true
     },
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "everywhere.projectPath": "/home/linux/Projetos/everywhere-harness"
 }

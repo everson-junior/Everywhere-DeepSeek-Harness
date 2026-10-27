@@ -257,6 +257,7 @@ function getHtmlForStatus(info: HarnessInfo): string {
   <div class="card">
     <div class="install-icon">⚡</div>
     <h2>EveryWhere Harness Não Encontrado</h2>
+    ${info.error ? `<div class="error-box">${info.error}</div>` : ''}
     <p>O comando <code>ewh</code> (ou <code>dsh</code>) não está instalado no seu sistema. Escolha como deseja instalar:</p>
 
     <button class="btn primary" id="btn-auto-install">
@@ -493,6 +494,9 @@ export class EveryWhereHarnessViewProvider implements vscode.WebviewViewProvider
           break
       }
     })
+
+    // Render initial webview content immediately
+    this.updateWebviewContent(this.dshManager.info)
 
     void this.dshManager.initStatus().then(() => {
       this.updateWebviewContent(this.dshManager.info)

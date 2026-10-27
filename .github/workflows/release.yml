@@ -487,24 +487,34 @@ jobs:
       - name: Prepare p2 Repository for GitHub Pages
         working-directory: eclipse
         run: |
+          # Localiza o diretorio p2 gerado pelo Tycho (target/repository ou target)
+          P2_DIR="target/repository"
+          if [ ! -d "$P2_DIR" ]; then
+            mkdir -p "$P2_DIR/plugins"
+            cp -f target/*.jar "$P2_DIR/plugins/" 2>/dev/null || true
+          fi
           # Copia landing page index.html e .nojekyll para a raiz do repositório p2
-          cp -f repository/index.html repository/target/repository/index.html
-          touch repository/target/repository/.nojekyll
+          cp -f repository/index.html "$P2_DIR/index.html"
+          touch "$P2_DIR/.nojekyll"
+          # Empacota zip do repositório p2 se ainda não foi gerado
+          if ! ls target/*.zip 1> /dev/null 2>&1; then
+            cd "$P2_DIR" && zip -r "../com.deepseek.everywhere.repository-${{ needs.get-version.outputs.version }}.zip" . && cd -
+          fi
 
       - name: Upload Eclipse p2 Repository as Workflow Artifact
         uses: actions/upload-artifact@v4
         with:
           name: everywhere-eclipse-${{ needs.get-version.outputs.version }}-p2-repository
-          path: eclipse/repository/target/com.deepseek.everywhere.repository-*.zip
+          path: eclipse/target/*.zip
           retention-days: 30
 
-      - name: Attach Eclipse Update Site ZIP to GitHub Release Assets
+      - name: Attach Eclipse Plugin & Repository ZIP to GitHub Release Assets
         if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            eclipse/repository/target/com.deepseek.everywhere.repository-*.zip
-            eclipse/plugin/target/com.deepseek.everywhere-*.jar
+            eclipse/target/*.zip
+            eclipse/target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -513,7 +523,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./eclipse/repository/target/repository
+          publish_dir: ./eclipse/target/repository
           keep_files: false
           commit_message: "Deploy p2 Update Site v${{ needs.get-version.outputs.version }} [skip ci]"
 

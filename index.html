@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Everywhere DeepSeek Harness - Eclipse p2 Update Site</title>
+  <title>EveryWhere Harness - Eclipse p2 Update Site</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -227,15 +227,20 @@
   <div class="container">
     <div class="header">
       <div class="logo-badge">
-        <span>🌐 Everywhere</span>
+        <span>🌐 EveryWhere</span>
         <span>•</span>
         <span>Eclipse p2 Repository</span>
       </div>
-      <h1>Everywhere DeepSeek Harness</h1>
-      <p class="subtitle">Repositório oficial p2 Update Site para instalação da extensão Everywhere no Eclipse IDE.</p>
+      <h1>EveryWhere Harness</h1>
+      <p class="subtitle">Repositório oficial p2 Update Site para instalação da extensão EveryWhere no Eclipse IDE.</p>
       <div class="status-badge">
         <span class="status-dot"></span>
         <span>Update Site Online & Ativo</span>
+      </div>
+      <div style="margin-top: 18px;">
+        <a href="https://marketplace.eclipse.org/content/everywhere-deepseek-harness" title="Arraste para o Eclipse IDE aberto para instalar">
+          <img src="https://marketplace.eclipse.org/sites/all/modules/custom/marketplace/images/installbutton.png" alt="Drag and drop into a running Eclipse IDE to install"/>
+        </a>
       </div>
     </div>
 
@@ -260,19 +265,52 @@
       </div>
       <div class="step-item">
         <div class="step-num">4</div>
-        <div>Selecione a categoria <strong>Everywhere - AI & DeepSeek Harness</strong> e conclua o assistente.</div>
+        <div>Selecione a categoria <strong>EveryWhere Harness</strong> e conclua o assistente.</div>
+      </div>
+    </div>
+
+    <!-- JetBrains Marketplace Widget / IntelliJ IDEA -->
+    <div class="steps">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
+          <rect width="24" height="24" rx="4" fill="#000000"/>
+          <path d="M4 18.5H11.5V20H4V18.5Z" fill="#FE2857"/>
+          <path d="M4 4H7.5V11H4V4Z" fill="#FE2857"/>
+          <path d="M8.5 4H12V7.5H8.5V4Z" fill="#0079F2"/>
+          <path d="M8.5 7.5H12V11H8.5V7.5Z" fill="#3BE8B0"/>
+        </svg>
+        <span>IntelliJ IDEA • JetBrains Marketplace</span>
+      </h2>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 14px;">
+        Instale o plugin oficial diretamente no seu IntelliJ IDEA (Community ou Ultimate) a partir do Marketplace oficial:
+      </p>
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; background: rgba(1, 4, 9, 0.6); border: 1px solid var(--border); border-radius: 10px;">
+        <div id="intellij-marketplace-widget">
+          <a href="https://plugins.jetbrains.com/plugin/35191" target="_blank" rel="noopener">
+            <img src="https://img.shields.io/badge/JetBrains%20Marketplace-Install%20to%20IntelliJ-fe2857?style=for-the-badge&logo=intellijidea&logoColor=white" alt="Install to IntelliJ IDEA from JetBrains Marketplace"/>
+          </a>
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">Plugin ID: <code class="code-tag">35191</code> • JetBrains Marketplace Oficial</span>
       </div>
     </div>
 
     <div class="footer">
-      <span>Feature ID: <code class="code-tag">com.deepseek.everywhere.feature.group</code></span>
+      <span>Feature ID: <code class="code-tag">com.deepseek.everywhere.feature.group</code> • Plugin ID: <code class="code-tag">35191</code></span>
       <div>
         <a href="https://github.com/everson-junior/Everywhere-DeepSeek-Harness" target="_blank" rel="noopener">GitHub</a>
+        <span> • </span>
+        <a href="https://plugins.jetbrains.com/plugin/35191" target="_blank" rel="noopener">JetBrains Marketplace</a>
         <span> • </span>
         <a href="https://marketplace.eclipse.org/" target="_blank" rel="noopener">Eclipse Marketplace</a>
       </div>
     </div>
   </div>
+
+  <script src="https://plugins.jetbrains.com/assets/scripts/mp-widget.js"></script>
+  <script>
+    // Configura o widget oficial do JetBrains Marketplace para o plugin Everywhere (ID: 35191)
+    MarketplaceWidget.setupMarketplaceWidget('install', 35191, "#intellij-marketplace-widget");
+  </script>
 
   <script>
     function copyUrl() {

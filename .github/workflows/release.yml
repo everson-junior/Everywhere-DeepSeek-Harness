@@ -482,24 +482,25 @@ jobs:
         working-directory: eclipse
         run: |
           chmod +x mvnw
-          ./mvnw clean verify
+          ./mvnw -f reactor/pom.xml clean verify
 
       - name: Prepare p2 Repository for GitHub Pages
         working-directory: eclipse
         run: |
-          # Localiza o diretorio p2 gerado pelo Tycho (target/repository ou target)
           P2_DIR="target/repository"
-          if [ ! -d "$P2_DIR" ]; then
-            mkdir -p "$P2_DIR/plugins"
-            cp -f target/*.jar "$P2_DIR/plugins/" 2>/dev/null || true
+          for metadata in content.jar artifacts.jar p2.index; do
+            if [ ! -s "$P2_DIR/$metadata" ]; then
+              echo "::error::Tycho p2 repository is missing $P2_DIR/$metadata"
+              exit 1
+            fi
+          done
+          if ! find "$P2_DIR" -type f -name 'com.deepseek.everywhere_*.jar' -print -quit | grep -q .; then
+            echo "::error::Tycho p2 repository does not contain the EveryWhere bundle"
+            exit 1
           fi
-          # Copia landing page index.html e .nojekyll para a raiz do repositório p2
           cp -f repository/index.html "$P2_DIR/index.html"
           touch "$P2_DIR/.nojekyll"
-          # Empacota zip do repositório p2 se ainda não foi gerado
-          if ! ls target/*.zip 1> /dev/null 2>&1; then
-            cd "$P2_DIR" && zip -r "../com.deepseek.everywhere.repository-${{ needs.get-version.outputs.version }}.zip" . && cd -
-          fi
+          (cd "$P2_DIR" && zip -r "../com.deepseek.everywhere.repository-${{ needs.get-version.outputs.version }}.zip" .)
 
       - name: Upload Eclipse p2 Repository as Workflow Artifact
         uses: actions/upload-artifact@v4

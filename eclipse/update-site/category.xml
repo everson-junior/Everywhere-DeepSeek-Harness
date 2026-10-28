@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+    <bundle id="com.deepseek.everywhere">
+        <category name="everywhere"/>
+    </bundle>
+    <category-def name="everywhere" label="EveryWhere Harness">
+        <description>EveryWhere Harness integration for Eclipse IDE.</description>
+    </category-def>
+</site>

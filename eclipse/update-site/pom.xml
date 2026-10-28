@@ -23,8 +23,8 @@
         <dependency>
             <groupId>com.deepseek.everywhere</groupId>
             <artifactId>com.deepseek.everywhere</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <type>eclipse-plugin</type>
+            <version>1.0.1-SNAPSHOT</version>
+            <type>eclipse-feature</type>
         </dependency>
     </dependencies>
 

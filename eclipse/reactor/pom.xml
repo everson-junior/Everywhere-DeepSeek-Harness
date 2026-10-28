@@ -11,6 +11,7 @@
 
     <modules>
         <module>..</module>
+        <module>../feature</module>
         <module>../update-site</module>
     </modules>
 

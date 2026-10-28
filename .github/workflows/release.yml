@@ -498,6 +498,10 @@ jobs:
             echo "::error::Tycho p2 repository does not contain the EveryWhere bundle"
             exit 1
           fi
+          if ! unzip -p "$P2_DIR/content.jar" content.xml | grep -Fq "id='com.deepseek.everywhere.feature.group'"; then
+            echo "::error::Tycho p2 repository does not contain the Marketplace feature group"
+            exit 1
+          fi
           cp -f repository/index.html "$P2_DIR/index.html"
           touch "$P2_DIR/.nojekyll"
           (cd "$P2_DIR" && zip -r "../com.deepseek.everywhere.repository-${{ needs.get-version.outputs.version }}.zip" .)

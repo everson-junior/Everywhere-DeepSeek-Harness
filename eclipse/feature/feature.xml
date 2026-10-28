@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.deepseek.everywhere"
+      label="EveryWhere Code"
+      version="1.0.1.qualifier"
+      provider-name="EveryWhere Harness">
+
+   <description>
+      EveryWhere Harness integration for Eclipse IDE.
+   </description>
+
+   <plugin
+         id="com.deepseek.everywhere"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+</feature>

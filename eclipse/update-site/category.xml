@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-    <bundle id="com.deepseek.everywhere">
+    <feature id="com.deepseek.everywhere" version="0.0.0">
         <category name="everywhere"/>
-    </bundle>
+    </feature>
     <category-def name="everywhere" label="EveryWhere Harness">
         <description>EveryWhere Harness integration for Eclipse IDE.</description>
     </category-def>

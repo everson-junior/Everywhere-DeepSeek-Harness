@@ -3,6 +3,7 @@ package com.deepseek.everywhere.service
 import com.deepseek.everywhere.settings.EverywhereSettingsState
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
@@ -19,6 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
 enum class HarnessStatus {
+    CHECKING,
+    NOT_INSTALLED,
+    INSTALLING,
     STOPPED,
     STARTING,
     RUNNING,
@@ -36,8 +40,9 @@ class DshManagerService(private val project: Project) {
     private var currentProcess: Process? = null
     private val listeners = CopyOnWriteArrayList<HarnessStatusListener>()
     private val logBuffer = mutableListOf<String>()
+    private val isInstalling = AtomicBoolean(false)
 
-    var status: HarnessStatus = HarnessStatus.STOPPED
+    var status: HarnessStatus = HarnessStatus.CHECKING
         private set
     var activeUrl: String? = null
         private set
@@ -66,6 +71,88 @@ class DshManagerService(private val project: Project) {
     }
 
     fun getLogs(): List<String> = synchronized(logBuffer) { logBuffer.toList() }
+
+    fun isHarnessAvailable(customPath: String = EverywhereSettingsState.instance.customDshPath): Boolean {
+        if (customPath.isNotBlank() && File(customPath).isFile) return true
+
+        val executable = findDshExecutable("")
+        if (File(executable).isFile) return true
+
+        return !(executable.equals("ewh", ignoreCase = true)
+                || executable.equals("ewh.cmd", ignoreCase = true)
+                || executable.equals("dsh", ignoreCase = true)
+                || executable.equals("dsh.cmd", ignoreCase = true))
+    }
+
+    fun checkAvailability(onComplete: (Boolean) -> Unit) {
+        setStatus(HarnessStatus.CHECKING)
+        val customPath = EverywhereSettingsState.instance.customDshPath
+        ApplicationManager.getApplication().executeOnPooledThread {
+            val available = isHarnessAvailable(customPath)
+            ApplicationManager.getApplication().invokeLater {
+                setStatus(
+                    if (available) HarnessStatus.STOPPED else HarnessStatus.NOT_INSTALLED,
+                    error = if (available) null else "EveryWhere Code runtime não encontrado. Instale para continuar."
+                )
+                onComplete(available)
+            }
+        }
+    }
+
+    fun installHarness() {
+        if (!isInstalling.compareAndSet(false, true)) return
+        setStatus(HarnessStatus.INSTALLING)
+
+        Thread {
+            try {
+                appendLog("Installing @everywhere-harness/ewh with npm...")
+                val command = if (SystemInfo.isWindows) {
+                    listOf("cmd.exe", "/c", "npm install -g @everywhere-harness/ewh")
+                } else {
+                    listOf("npm", "install", "-g", "@everywhere-harness/ewh")
+                }
+                val process = ProcessBuilder(command).redirectErrorStream(true).start()
+                process.inputStream.bufferedReader().useLines { lines ->
+                    lines.forEach(::appendLog)
+                }
+                val exitCode = process.waitFor()
+                val available = exitCode == 0 && isHarnessAvailable()
+                val message = if (available) {
+                    "EveryWhere Code installed successfully."
+                } else {
+                    "Installation could not be verified. Run `npm install -g @everywhere-harness/ewh` in a terminal."
+                }
+                val type = if (available) NotificationType.INFORMATION else NotificationType.ERROR
+                appendLog(message)
+                setStatus(
+                    if (available) HarnessStatus.STOPPED else HarnessStatus.NOT_INSTALLED,
+                    error = if (available) null else message
+                )
+                ApplicationManager.getApplication().invokeLater {
+                    NotificationGroupManager.getInstance()
+                        .getNotificationGroup("Everywhere Notification Group")
+                        .createNotification("EveryWhere Code", message, type)
+                        .notify(project)
+                }
+            } catch (error: Exception) {
+                val message = "Installation failed: ${error.message}. Run `npm install -g @everywhere-harness/ewh` in a terminal."
+                appendLog(message)
+                setStatus(HarnessStatus.NOT_INSTALLED, error = message)
+                ApplicationManager.getApplication().invokeLater {
+                    NotificationGroupManager.getInstance()
+                        .getNotificationGroup("Everywhere Notification Group")
+                        .createNotification("EveryWhere Code", message, NotificationType.ERROR)
+                        .notify(project)
+                }
+            } finally {
+                isInstalling.set(false)
+            }
+        }.apply {
+            name = "EveryWhere Code installer"
+            isDaemon = true
+            start()
+        }
+    }
 
     private fun appendLog(line: String) {
         synchronized(logBuffer) {
@@ -162,6 +249,16 @@ class DshManagerService(private val project: Project) {
                 }
             }
 
+            val pathEntries = (System.getenv("PATH") ?: "").split(File.pathSeparator)
+            for (pathEntry in pathEntries) {
+                for (commandName in listOf("ewh", "dsh")) {
+                    val candidate = File(pathEntry, commandName)
+                    if (candidate.isFile && candidate.canExecute()) {
+                        return candidate.absolutePath
+                    }
+                }
+            }
+
             return "ewh"
         }
     }
@@ -195,6 +292,14 @@ class DshManagerService(private val project: Project) {
             appendLog("[EveryWhere Harness] Backend ready at: ${existing.second}")
             setStatus(HarnessStatus.RUNNING, url = existing.second, port = existing.first)
             notifySuccess(existing.second)
+            return
+        }
+
+        if (!isHarnessAvailable(settings.customDshPath)) {
+            setStatus(
+                HarnessStatus.NOT_INSTALLED,
+                error = "EveryWhere Code runtime não encontrado. Instale `@everywhere-harness/ewh` para continuar."
+            )
             return
         }
 

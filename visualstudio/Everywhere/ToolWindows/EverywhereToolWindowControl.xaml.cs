@@ -136,6 +136,11 @@ namespace Everywhere.ToolWindows
             await StartHarnessAsync();
         }
 
+        private async void BtnInstall_Click(object sender, RoutedEventArgs e)
+        {
+            await DshManager.Instance.InstallHarnessAsync();
+        }
+
         private async void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             await DshManager.Instance.StopAsync();

@@ -10,7 +10,7 @@ namespace Everywhere.ToolWindows
     {
         public EverywhereToolWindow() : base(null)
         {
-            Caption = "EveryWhere Harness";
+            Caption = "EveryWhere Code";
             Content = new EverywhereToolWindowControl();
         }
     }

@@ -30,6 +30,7 @@ namespace Everywhere.Services
         private Process? _currentProcess;
         private IVsOutputWindowPane? _outputPane;
         private readonly object _lock = new object();
+        private int _installationInProgress;
 
         public HarnessStatus Status { get; private set; } = HarnessStatus.Stopped;
         public string? ActiveUrl { get; private set; }
@@ -116,6 +117,64 @@ namespace Everywhere.Services
             }
 
             return "ewh.cmd";
+        }
+
+        public async System.Threading.Tasks.Task<bool> InstallHarnessAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            if (Interlocked.Exchange(ref _installationInProgress, 1) != 0)
+            {
+                return false;
+            }
+
+            try
+            {
+                Log("Installing @everywhere-harness/ewh with npm...");
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c npm install -g @everywhere-harness/ewh",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                });
+                if (process == null)
+                {
+                    Log("Failed to start npm. Run `npm install -g @everywhere-harness/ewh` in a terminal.");
+                    return false;
+                }
+
+                var stdoutTask = process.StandardOutput.ReadToEndAsync();
+                var stderrTask = process.StandardError.ReadToEndAsync();
+                await System.Threading.Tasks.Task.Run(() => process.WaitForExit());
+                var output = await System.Threading.Tasks.Task.WhenAll(stdoutTask, stderrTask);
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                foreach (var line in (output[0] + Environment.NewLine + output[1]).Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    Log(line);
+                }
+
+                if (process.ExitCode == 0)
+                {
+                    Log("EveryWhere Code installed successfully.");
+                    return true;
+                }
+
+                Log("Installation failed. Run `npm install -g @everywhere-harness/ewh` in a terminal.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                Log($"Installation failed: {ex.Message}. Run `npm install -g @everywhere-harness/ewh` in a terminal.");
+                return false;
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _installationInProgress, 0);
+            }
         }
 
         public class RunningServiceInfo

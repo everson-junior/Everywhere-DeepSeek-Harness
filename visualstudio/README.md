@@ -2,7 +2,7 @@
 
 <img src="./Everywhere/Resources/Preview.png" alt="Everywhere - Visual Studio 2022 Extension" width="100%" />
 
-# EveryWhere Harness for Visual Studio 2022
+# EveryWhere Code for Visual Studio 2022
 
 [English](#-english) • [Português](#-português)
 

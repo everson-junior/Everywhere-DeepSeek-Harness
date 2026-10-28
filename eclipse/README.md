@@ -1,6 +1,6 @@
 <div align="center">
 
-# EveryWhere Harness for Eclipse IDE 🌐⚡
+# EveryWhere Code for Eclipse IDE 🌐⚡
 
 [English](#-english) • [Português](#-português)
 

@@ -24,7 +24,7 @@
     <Nullable>enable</Nullable>
     <Authors>EverDock</Authors>
     <Company>EverDock</Company>
-    <Product>EveryWhere Harness</Product>
+    <Product>EveryWhere Code</Product>
     <Description>Run official EveryWhere Harness autonomous AI agents directly inside Visual Studio 2022.</Description>
     <Version>0.1.0</Version>
   </PropertyGroup>

@@ -32,12 +32,12 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
         border = JBUI.Borders.emptyRight(8)
     }
 
-    private val overlayTitle = JBLabel("🌐 Everywhere", SwingConstants.CENTER).apply {
+    private val overlayTitle = JBLabel("🌐 EveryWhere Code", SwingConstants.CENTER).apply {
         font = font.deriveFont(Font.BOLD, 20f)
         alignmentX = Component.CENTER_ALIGNMENT
     }
 
-    private val overlaySubtitle = JBLabel("EveryWhere Harness Autonomous AI Agent", SwingConstants.CENTER).apply {
+    private val overlaySubtitle = JBLabel("EveryWhere Code Autonomous AI Agent", SwingConstants.CENTER).apply {
         font = font.deriveFont(Font.PLAIN, 12f)
         foreground = JBColor.GRAY
         alignmentX = Component.CENTER_ALIGNMENT
@@ -57,12 +57,24 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
     }
 
     private val overlayStartBtn = JButton("▶ Iniciar EveryWhere Harness").apply {
+        isVisible = false
         font = font.deriveFont(Font.BOLD, 13f)
         cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         alignmentX = Component.CENTER_ALIGNMENT
         maximumSize = Dimension(280, 36)
         addActionListener {
             DshManagerService.getInstance(project).start()
+        }
+    }
+
+    private val overlayInstallBtn = JButton("Instalar EveryWhere Code").apply {
+        isVisible = false
+        font = font.deriveFont(Font.PLAIN, 12f)
+        cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+        alignmentX = Component.CENTER_ALIGNMENT
+        maximumSize = Dimension(280, 32)
+        addActionListener {
+            DshManagerService.getInstance(project).installHarness()
         }
     }
 
@@ -96,9 +108,11 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
             ApplicationManager.getApplication().invokeLater {
                 service.start()
             }
-        } else if (EverywhereSettingsState.instance.autoStart && service.status == HarnessStatus.STOPPED) {
-            ApplicationManager.getApplication().invokeLater {
-                service.start()
+        } else {
+            service.checkAvailability { available ->
+                if (available && EverywhereSettingsState.instance.autoStart && service.status == HarnessStatus.STOPPED) {
+                    service.start()
+                }
             }
         }
     }
@@ -160,6 +174,8 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
 
                 add(overlayStartBtn)
                 add(Box.createVerticalStrut(8))
+                add(overlayInstallBtn)
+                add(Box.createVerticalStrut(8))
                 add(overlayStopBtn)
                 add(Box.createVerticalStrut(16))
 
@@ -196,6 +212,37 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
     override fun onStatusChanged(status: HarnessStatus, url: String?, port: Int?, error: String?) {
         ApplicationManager.getApplication().invokeLater {
             when (status) {
+                HarnessStatus.CHECKING -> {
+                    statusLabel.text = "Verificando runtime..."
+                    statusLabel.foreground = JBColor(Color(230, 81, 0), Color(220, 180, 80))
+                    overlayStatusText.isVisible = false
+                    overlayStartBtn.isVisible = false
+                    overlayInstallBtn.isVisible = false
+                    cardLayout.show(contentCardPanel, CARD_OVERLAY)
+                }
+                HarnessStatus.NOT_INSTALLED -> {
+                    statusLabel.text = "Não instalado"
+                    statusLabel.foreground = JBColor.GRAY
+                    overlayStatusText.text = "<html><center style='color:#f44336;'>${error ?: "EveryWhere Code não encontrado. Instale para continuar."}</center></html>"
+                    overlayStatusText.isVisible = true
+                    overlayStartBtn.isVisible = false
+                    overlayInstallBtn.isVisible = true
+                    overlayInstallBtn.isEnabled = true
+                    overlayInstallBtn.text = "Instalar EveryWhere Code"
+                    cardLayout.show(contentCardPanel, CARD_OVERLAY)
+                }
+                HarnessStatus.INSTALLING -> {
+                    statusLabel.text = "Instalando..."
+                    statusLabel.foreground = JBColor(Color(230, 81, 0), Color(220, 180, 80))
+                    overlayStatusText.text = "Instalando @everywhere-harness/ewh..."
+                    overlayStatusText.foreground = JBColor(Color(230, 81, 0), Color(220, 180, 80))
+                    overlayStatusText.isVisible = true
+                    overlayStartBtn.isVisible = false
+                    overlayInstallBtn.isVisible = true
+                    overlayInstallBtn.isEnabled = false
+                    overlayInstallBtn.text = "Instalando..."
+                    cardLayout.show(contentCardPanel, CARD_OVERLAY)
+                }
                 HarnessStatus.RUNNING -> {
                     statusLabel.text = "Ativo (:${port ?: 3080})"
                     statusLabel.foreground = JBColor(Color(46, 125, 50), Color(78, 201, 176))
@@ -203,6 +250,8 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
                     if (!url.isNullOrEmpty()) {
                         jbCefBrowser?.loadURL(url)
                     }
+                    overlayInstallBtn.isVisible = false
+                    overlayStartBtn.isVisible = false
                     cardLayout.show(contentCardPanel, CARD_BROWSER)
                 }
                 HarnessStatus.STARTING -> {
@@ -213,6 +262,8 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
                     overlayStatusText.foreground = JBColor(Color(230, 81, 0), Color(220, 180, 80))
                     overlayStatusText.isVisible = true
                     overlayStartBtn.isEnabled = false
+                    overlayStartBtn.isVisible = true
+                    overlayInstallBtn.isVisible = false
                     cardLayout.show(contentCardPanel, CARD_OVERLAY)
                 }
                 HarnessStatus.ERROR -> {
@@ -223,6 +274,8 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
                     overlayStatusText.isVisible = true
                     overlayStartBtn.isEnabled = true
                     overlayStartBtn.text = "🔄 Tentar Novamente"
+                    overlayStartBtn.isVisible = true
+                    overlayInstallBtn.isVisible = false
                     cardLayout.show(contentCardPanel, CARD_OVERLAY)
                 }
                 HarnessStatus.STOPPED -> {
@@ -232,9 +285,13 @@ class EverywhereToolWindowPanel(private val project: Project) : SimpleToolWindow
                     overlayStatusText.isVisible = false
                     overlayStartBtn.isEnabled = true
                     overlayStartBtn.text = "▶ Iniciar EveryWhere Harness"
+                    overlayStartBtn.isVisible = true
+                    overlayInstallBtn.isVisible = false
                     cardLayout.show(contentCardPanel, CARD_OVERLAY)
                 }
             }
+            contentCardPanel.revalidate()
+            contentCardPanel.repaint()
         }
     }
 

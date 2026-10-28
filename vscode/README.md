@@ -2,7 +2,7 @@
 
 <img src="./media/everdock-banner.jpg" alt="Everywhere - Conectando suas IDEs ao EveryWhere" width="100%" />
 
-# EveryWhere Harness for Visual Studio Code
+# EveryWhere Code for Visual Studio Code
 
 [English](#-english) • [Português](#-português)
 

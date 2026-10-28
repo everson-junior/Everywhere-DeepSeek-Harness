@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
@@ -42,11 +43,13 @@ public class DshManager {
 
     private Process currentProcess;
     private final List<HarnessStatusListener> listeners = new CopyOnWriteArrayList<>();
+    private final AtomicBoolean installationInProgress = new AtomicBoolean(false);
 
-    private volatile HarnessStatus status = HarnessStatus.STOPPED;
+    private volatile HarnessStatus status = HarnessStatus.CHECKING;
     private volatile String activeUrl = null;
     private volatile Integer activePort = null;
     private volatile String lastError = null;
+    private volatile String lastCustomDshPath = "";
 
     private static final Pattern URL_DSH_REGEX = Pattern.compile("(?:ewh|dsh) web:\\s*(https?://\\S+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern URL_FALLBACK_REGEX = Pattern.compile("(https?://(?:127\\.0\\.0\\.1|localhost):\\d+[^\\s\"'<>\\)]*)", Pattern.CASE_INSENSITIVE);
@@ -241,6 +244,77 @@ public class DshManager {
         }
     }
 
+    public boolean isDshAvailable(String customPath) {
+        if (customPath != null && !customPath.trim().isEmpty() && new File(customPath.trim()).isFile()) {
+            return true;
+        }
+
+        String executable = findDshExecutable("");
+        if (new File(executable).isFile()) return true;
+
+        return !(executable.equalsIgnoreCase("ewh") || executable.equalsIgnoreCase("ewh.cmd")
+                || executable.equalsIgnoreCase("dsh") || executable.equalsIgnoreCase("dsh.cmd"));
+    }
+
+    public void checkAvailability(String customPath, Consumer<Boolean> callback) {
+        lastCustomDshPath = customPath != null ? customPath : "";
+        setStatus(HarnessStatus.CHECKING, null, null, null);
+
+        Thread checker = new Thread(() -> {
+            boolean available = isDshAvailable(lastCustomDshPath);
+            setStatus(available ? HarnessStatus.STOPPED : HarnessStatus.NOT_INSTALLED, null, null,
+                    available ? null : "EveryWhere Code runtime was not found. Install it to continue.");
+            if (callback != null) callback.accept(available);
+        }, "EveryWhere Code runtime check");
+        checker.setDaemon(true);
+        checker.start();
+    }
+
+    public void installHarness() {
+        if (!installationInProgress.compareAndSet(false, true)) return;
+        setStatus(HarnessStatus.INSTALLING, null, null, null);
+
+        Thread installer = new Thread(() -> {
+            try {
+                EverywhereConsole.log("Installing @everywhere-harness/ewh with npm...");
+                boolean isWindows = System.getProperty("os.name", "").toLowerCase().contains("win");
+                ProcessBuilder builder = isWindows
+                        ? new ProcessBuilder("cmd.exe", "/c", "npm install -g @everywhere-harness/ewh")
+                        : new ProcessBuilder("npm", "install", "-g", "@everywhere-harness/ewh");
+                builder.redirectErrorStream(true);
+                Process process = builder.start();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        EverywhereConsole.log(line);
+                    }
+                }
+
+                int exitCode = process.waitFor();
+                boolean available = exitCode == 0 && isDshAvailable(lastCustomDshPath);
+                if (available) {
+                    EverywhereConsole.log("EveryWhere Code installed successfully.");
+                    setStatus(HarnessStatus.STOPPED, null, null, null);
+                } else {
+                    String message = "Installation could not be verified. Run `npm install -g @everywhere-harness/ewh` in a terminal.";
+                    EverywhereConsole.error(message);
+                    setStatus(HarnessStatus.NOT_INSTALLED, null, null, message);
+                }
+                EverywhereConsole.show();
+            } catch (Exception e) {
+                String message = "Installation failed: " + e.getMessage()
+                        + ". Run `npm install -g @everywhere-harness/ewh` in a terminal.";
+                EverywhereConsole.error(message);
+                setStatus(HarnessStatus.NOT_INSTALLED, null, null, message);
+                EverywhereConsole.show();
+            } finally {
+                installationInProgress.set(false);
+            }
+        }, "EveryWhere Code installer");
+        installer.setDaemon(true);
+        installer.start();
+    }
+
     public static class RunningServiceInfo {
         public final int port;
         public final String url;
@@ -363,11 +437,25 @@ public class DshManager {
             return;
         }
 
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        final String customDshPath = store.getString(PreferenceConstants.P_CUSTOM_DSH_PATH);
+        lastCustomDshPath = customDshPath;
+        RunningServiceInfo existing = findRunningDsh(store.getInt(PreferenceConstants.P_PORT));
+        if (existing != null) {
+            EverywhereConsole.log("[EveryWhere Harness] Serviço já em execução detectado na porta " + existing.port + ". Utilizando instância aberta...");
+            EverywhereConsole.log("[EveryWhere Harness] Backend ready at: " + existing.url);
+            setStatus(HarnessStatus.RUNNING, existing.url, existing.port, null);
+            return;
+        }
+        if (!isDshAvailable(customDshPath)) {
+            String message = "EveryWhere Code runtime não encontrado. Instale `@everywhere-harness/ewh` para continuar.";
+            setStatus(HarnessStatus.NOT_INSTALLED, null, null, message);
+            return;
+        }
+
         setStatus(HarnessStatus.STARTING, null, null, null);
         EverywhereConsole.log("Iniciando EveryWhere Harness runtime (tentativa " + (isRetry ? "2/recuperação" : "1") + ")...");
 
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        final String customDshPath = store.getString(PreferenceConstants.P_CUSTOM_DSH_PATH);
         final String executable = findDshExecutable(customDshPath);
         final String workingDir = resolveWorkspaceDirectory();
         String prof = store.getString(PreferenceConstants.P_PROFILE);
@@ -375,15 +463,6 @@ public class DshManager {
         final int targetPort = store.getInt(PreferenceConstants.P_PORT);
         final String apiKey = store.getString(PreferenceConstants.P_API_KEY);
         final String baseUrl = store.getString(PreferenceConstants.P_BASE_URL);
-
-        // Verificar se serviço já está em execução antes de iniciar novo processo
-        RunningServiceInfo existing = findRunningDsh(targetPort);
-        if (existing != null) {
-            EverywhereConsole.log("[EveryWhere Harness] Serviço já em execução detectado na porta " + existing.port + ". Utilizando instância aberta...");
-            EverywhereConsole.log("[EveryWhere Harness] Backend ready at: " + existing.url);
-            setStatus(HarnessStatus.RUNNING, existing.url, existing.port, null);
-            return;
-        }
 
         final List<String> cmdList = new ArrayList<>();
         boolean isWindows = System.getProperty("os.name", "").toLowerCase().contains("win");

@@ -23,7 +23,7 @@ class StartHarnessAction : AnAction("Iniciar", "Inicia o serviço EveryWhere Har
             return
         }
         val status = DshManagerService.getInstance(project).status
-        e.presentation.isEnabled = (status != HarnessStatus.STARTING && status != HarnessStatus.RUNNING)
+        e.presentation.isEnabled = status == HarnessStatus.STOPPED || status == HarnessStatus.ERROR
     }
 }
 

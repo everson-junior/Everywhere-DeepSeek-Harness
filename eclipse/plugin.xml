@@ -10,7 +10,7 @@
       </category>
       <view
             id="com.deepseek.everywhere.ui.EverywhereView"
-            name="EveryWhere Harness"
+            name="EveryWhere Code"
             icon="icons/deepseek_16.png"
             category="com.deepseek.everywhere.category"
             class="com.deepseek.everywhere.ui.EverywhereView"
@@ -99,7 +99,7 @@
    <extension point="org.eclipse.ui.preferencePages">
       <page
             id="com.deepseek.everywhere.preferences.page"
-            name="EveryWhere Harness"
+            name="EveryWhere Code"
             class="com.deepseek.everywhere.preferences.EverywherePreferencePage">
       </page>
    </extension>

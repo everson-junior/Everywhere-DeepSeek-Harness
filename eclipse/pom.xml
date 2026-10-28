@@ -9,7 +9,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>eclipse-plugin</packaging>
 
-    <name>EveryWhere Harness for Eclipse</name>
+    <name>EveryWhere Code for Eclipse</name>
     <description>Plugin para Eclipse IDE integrando o EveryWhere Harness runtime</description>
 
     <properties>

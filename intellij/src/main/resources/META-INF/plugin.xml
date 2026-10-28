@@ -1,12 +1,12 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.deepseek.everywhere</id>
-    <name>EveryWhere Harness</name>
+    <name>EveryWhere Code</name>
     <vendor email="support@deepseek.com" url="https://github.com/everson-junior/DeepSeek-Harness-Everywhere">EveryWhere Team</vendor>
 
     <description><![CDATA[
-        <h2>EveryWhere Harness for IntelliJ IDEA</h2>
-        <p>Integrates the <b>EveryWhere Harness (ewh / dsh)</b> autonomous AI agent runtime directly inside IntelliJ IDEA.</p>
+        <h2>EveryWhere Code for IntelliJ IDEA</h2>
+        <p>Integrates the <b>EveryWhere Code (ewh / dsh)</b> autonomous AI agent runtime directly inside IntelliJ IDEA.</p>
 
         <h3>Features:</h3>
         <ul>
@@ -22,7 +22,7 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Everywhere"
+        <toolWindow id="EveryWhere Code"
                     anchor="right"
                     factoryClass="com.deepseek.everywhere.ui.EverywhereToolWindowFactory"
                     icon="/icons/toolWindow.svg"/>
@@ -33,13 +33,13 @@
         <applicationConfigurable parentId="tools"
                                  instance="com.deepseek.everywhere.settings.EverywhereConfigurable"
                                  id="com.deepseek.everywhere.settings.EverywhereConfigurable"
-                                 displayName="EveryWhere Harness"/>
+                                 displayName="EveryWhere Code"/>
 
         <notificationGroup id="Everywhere Notification Group" displayType="BALLOON"/>
     </extensions>
 
     <actions>
-        <group id="Everywhere.ToolsMenu" text="EveryWhere Harness" popup="true">
+        <group id="Everywhere.ToolsMenu" text="EveryWhere Code" popup="true">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <action id="Everywhere.Start"
                     class="com.deepseek.everywhere.action.StartHarnessAction"

@@ -46,6 +46,7 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
     private Label workspaceLabel;
     private Label errorLabel;
     private Button startButton;
+    private Button installButton;
     private Button stopButton;
 
     private StartHarnessAction startAction;
@@ -89,12 +90,11 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
             display.asyncExec(() -> DshManager.getInstance().start());
         } else {
             boolean autoStart = store.getBoolean(PreferenceConstants.P_AUTO_START);
-            if (autoStart && DshManager.getInstance().getStatus() == HarnessStatus.STOPPED) {
-                display.asyncExec(() -> DshManager.getInstance().start());
-            } else {
-                stackLayout.topControl = overlayComposite;
-                mainContainer.layout();
-            }
+            String customDshPath = store.getString(PreferenceConstants.P_CUSTOM_DSH_PATH);
+            DshManager.getInstance().checkAvailability(customDshPath, available -> display.asyncExec(() -> {
+                if (mainContainer == null || mainContainer.isDisposed()) return;
+                if (available && autoStart) DshManager.getInstance().start();
+            }));
         }
     }
 
@@ -107,12 +107,12 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
         overlayComposite.setLayout(grid);
 
         Label title = new Label(overlayComposite, SWT.CENTER);
-        title.setText("🌐 Everywhere");
+        title.setText("🌐 EveryWhere Code");
         title.setFont(titleFont);
         title.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
 
         Label subtitle = new Label(overlayComposite, SWT.CENTER);
-        subtitle.setText("EveryWhere Harness Autonomous AI Agent");
+        subtitle.setText("EveryWhere Code Autonomous AI Agent");
         subtitle.setFont(subtitleFont);
         subtitle.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
         subtitle.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
@@ -154,8 +154,20 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
         GridData sbGd = new GridData(SWT.FILL, SWT.CENTER, true, false);
         sbGd.widthHint = 260;
         sbGd.heightHint = 34;
+        sbGd.exclude = true;
         startButton.setLayoutData(sbGd);
+        startButton.setVisible(false);
         startButton.addListener(SWT.Selection, e -> DshManager.getInstance().start());
+
+        installButton = new Button(btnComposite, SWT.PUSH);
+        installButton.setText("Instalar EveryWhere Code");
+        GridData ibGd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        ibGd.widthHint = 260;
+        ibGd.heightHint = 30;
+        ibGd.exclude = true;
+        installButton.setLayoutData(ibGd);
+        installButton.setVisible(false);
+        installButton.addListener(SWT.Selection, e -> DshManager.getInstance().installHarness());
 
         stopButton = new Button(btnComposite, SWT.PUSH);
         stopButton.setText("🛑 Parar Processos Anteriores");
@@ -241,11 +253,43 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
                         statusLabel.setText("⏳ Status: Iniciando serviço EveryWhere...");
                         statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
                         if (errorLabel != null) errorLabel.setVisible(false);
+                        setButtonVisible(startButton, false);
+                        setButtonVisible(installButton, false);
+                        break;
+                    case CHECKING:
+                        statusLabel.setText("⏳ Verificando EveryWhere Code...");
+                        statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+                        if (errorLabel != null) errorLabel.setVisible(false);
+                        setButtonVisible(startButton, false);
+                        setButtonVisible(installButton, false);
+                        break;
+                    case NOT_INSTALLED:
+                        statusLabel.setText("EveryWhere Code não encontrado");
+                        statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
+                        if (errorLabel != null) {
+                            errorLabel.setText(error != null ? error : "Instale o runtime para continuar.");
+                            errorLabel.setVisible(true);
+                        }
+                        installButton.setText("Instalar EveryWhere Code");
+                        installButton.setEnabled(true);
+                        setButtonVisible(startButton, false);
+                        setButtonVisible(installButton, true);
+                        break;
+                    case INSTALLING:
+                        statusLabel.setText("Instalando EveryWhere Code...");
+                        statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+                        if (errorLabel != null) errorLabel.setVisible(false);
+                        installButton.setText("Instalando...");
+                        installButton.setEnabled(false);
+                        setButtonVisible(startButton, false);
+                        setButtonVisible(installButton, true);
                         break;
                     case RUNNING:
                         statusLabel.setText("✅ Status: Em execução (" + (url != null ? url : "") + ")");
                         statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_GREEN));
                         if (errorLabel != null) errorLabel.setVisible(false);
+                        setButtonVisible(startButton, false);
+                        setButtonVisible(installButton, false);
                         break;
                     case ERROR:
                         statusLabel.setText("❌ Status: Falha na inicialização");
@@ -254,12 +298,18 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
                             errorLabel.setText(error != null ? error : "Erro desconhecido");
                             errorLabel.setVisible(true);
                         }
+                        startButton.setText("🔄 Tentar novamente");
+                        setButtonVisible(startButton, true);
+                        setButtonVisible(installButton, false);
                         break;
                     case STOPPED:
                     default:
                         statusLabel.setText("⏹ Status: Parado");
                         statusLabel.setForeground(display.getSystemColor(SWT.COLOR_DARK_GRAY));
                         if (errorLabel != null) errorLabel.setVisible(false);
+                        startButton.setText("▶ Iniciar EveryWhere Harness");
+                        setButtonVisible(startButton, true);
+                        setButtonVisible(installButton, false);
                         break;
                 }
             }
@@ -275,6 +325,13 @@ public class EverywhereView extends ViewPart implements HarnessStatusListener {
             }
             mainContainer.layout(true, true);
         });
+    }
+
+    private void setButtonVisible(Button button, boolean visible) {
+        if (button == null || button.isDisposed()) return;
+        button.setVisible(visible);
+        if (button.getLayoutData() instanceof GridData data) data.exclude = !visible;
+        button.getParent().layout(true, true);
     }
 
     @Override

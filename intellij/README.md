@@ -1,6 +1,6 @@
 <div align="center">
 
-# EveryWhere Harness for IntelliJ IDEA 🌐⚡
+# EveryWhere Code for IntelliJ IDEA 🌐⚡
 
 [English](#-english) • [Português](#-português)
 

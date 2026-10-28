@@ -19,6 +19,6 @@ public class StartHarnessAction extends Action {
 
     public void updateState() {
         HarnessStatus status = DshManager.getInstance().getStatus();
-        setEnabled(status != HarnessStatus.STARTING && status != HarnessStatus.RUNNING);
+        setEnabled(status == HarnessStatus.STOPPED || status == HarnessStatus.ERROR);
     }
 }
